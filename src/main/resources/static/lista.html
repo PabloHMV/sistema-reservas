@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Lista de Reservas</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f3f4f6;
+    padding: 40px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.filtros {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.filtros select,
+.filtros input,
+.filtros button {
+    padding: 8px;
+    margin: 5px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+table {
+    width: 100%;
+    background: white;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+    font-size: 14px;
+}
+
+th {
+    background: #2563eb;
+    color: white;
+}
+
+button {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.voucher {
+    background: #16a34a;
+    color: white;
+}
+
+.editar {
+    background: #f59e0b;
+    color: white;
+}
+
+.excluir {
+    background: #dc2626;
+    color: white;
+}
+
+.valor-ok {
+    color: #16a34a;
+    font-weight: bold;
+}
+
+.valor-atencao {
+    color: #f59e0b;
+    font-weight: bold;
+}
+
+.valor-pendente {
+    color: #dc2626;
+    font-weight: bold;
+}
+
+.voltar {
+    margin-top: 20px;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    color: #2563eb;
+}
+</style>
+</head>
+
+<body>
+
+<h2>📄 Reservas</h2>
+
+<!-- FILTROS -->
+<div class="filtros">
+    <input type="text" id="filtroNome" placeholder="Buscar por nome">
+
+    <select id="filtroStatus">
+        <option value="">Todos os Status</option>
+        <option value="RESERVADO">Reservado</option>
+        <option value="AGUARDANDO">Aguardando</option>
+        <option value="CANCELADO">Cancelado</option>
+    </select>
+
+    <input type="date" id="filtroData">
+
+    <button onclick="aplicarFiltro()">Filtrar</button>
+    <button onclick="location.reload()">Limpar</button>
+</div>
+
+<table>
+<thead>
+<tr>
+    <th>Voucher</th>
+    <th>Nome</th>
+    <th>Quarto</th>
+    <th>Check-in</th>
+    <th>Check-out</th>
+    <th>Total</th>
+    <th>Pago</th>
+    <th>Restante</th>
+    <th>Status</th>
+    <th>Ações</th>
+</tr>
+</thead>
+<tbody id="tabela"></tbody>
+</table>
+
+<a href="index.html" class="voltar">➕ Nova Reserva</a>
+
+<script>
+const API = "http://localhost:8080/reservas";
+let reservas = [];
+
+fetch(API)
+.then(res => res.json())
+.then(dados => {
+    reservas = dados;
+    renderizar(dados);
+});
+
+function renderizar(lista) {
+    const tabela = document.getElementById("tabela");
+    tabela.innerHTML = "";
+
+    lista.forEach(r => {
+
+        const restante = Number(r.valorTotal ?? 0) - Number(r.valorPago ?? 0);
+
+        let classeValor = "valor-ok";
+        if (restante > 0 && restante <= 100) classeValor = "valor-atencao";
+        if (restante > 100) classeValor = "valor-pendente";
+
+        tabela.innerHTML += `
+        <tr>
+            <td>${r.voucherNumero ?? "#" + r.id}</td>
+            <td>${r.nome}</td>
+            <td>${r.numeroQuarto ?? "-"}</td>
+            <td>${r.checkin}</td>
+            <td>${r.checkout}</td>
+            <td>R$ ${Number(r.valorTotal ?? 0).toFixed(2)}</td>
+            <td>R$ ${Number(r.valorPago ?? 0).toFixed(2)}</td>
+            <td class="${classeValor}">
+                R$ ${restante.toFixed(2)}
+            </td>
+            <td>${r.status}</td>
+            <td>
+                <button class="voucher" onclick="voucher(${r.id})">Voucher</button>
+                <button class="editar" onclick="editar(${r.id})">Editar</button>
+                <button class="excluir" onclick="excluir(${r.id})">Excluir</button>
+            </td>
+        </tr>`;
+    });
+}
+
+function aplicarFiltro() {
+    const nome = document.getElementById("filtroNome").value.toLowerCase();
+    const status = document.getElementById("filtroStatus").value;
+    const data = document.getElementById("filtroData").value;
+
+    let filtrado = reservas;
+
+    if (nome) {
+        filtrado = filtrado.filter(r =>
+            r.nome.toLowerCase().includes(nome)
+        );
+    }
+
+    if (status) {
+        filtrado = filtrado.filter(r => r.status === status);
+    }
+
+    if (data) {
+        filtrado = filtrado.filter(r =>
+            r.checkin <= data && r.checkout >= data
+        );
+    }
+
+    renderizar(filtrado);
+}
+
+function excluir(id) {
+    if (!confirm("Deseja excluir esta reserva?")) return;
+
+    fetch(`${API}/${id}`, { method: "DELETE" })
+        .then(() => location.reload());
+}
+
+function voucher(id) {
+    window.open(`${API}/voucher/${id}`, "_blank");
+}
+
+function editar(id) {
+    window.location.href = `editar.html?id=${id}`;
+}
+</script>
+
+</body>
+</html>

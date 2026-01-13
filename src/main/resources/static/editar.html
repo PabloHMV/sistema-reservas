@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Editar Reserva</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f3f4f6;
+    padding: 40px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+form {
+    max-width: 600px;
+    margin: auto;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+input, select, button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+button {
+    background: #2563eb;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+.voltar {
+    display: block;
+    margin-top: 15px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    color: #2563eb;
+}
+</style>
+</head>
+
+<body>
+
+<h2>✏️ Editar Reserva</h2>
+
+<form id="formEditar">
+    <input name="nome" placeholder="Nome" required>
+    <input name="telefone" placeholder="Telefone" required>
+
+    <input type="date" name="checkin" required>
+    <input type="date" name="checkout" required>
+
+    <input name="tipoQuarto" placeholder="Tipo de quarto">
+    <input type="number" name="quantidadePessoas" placeholder="Qtd pessoas">
+
+    <input type="number" step="0.01" name="valorTotal" placeholder="Valor total">
+    <input type="number" step="0.01" name="valorPago" placeholder="Valor pago">
+
+    <select name="status">
+        <option value="RESERVADO">Reservado</option>
+        <option value="AGUARDANDO">Aguardando retorno</option>
+        <option value="CANCELADO">Cancelado</option>
+    </select>
+
+    <button type="submit">Salvar Alterações</button>
+</form>
+
+<a href="lista.html" class="voltar">⬅ Voltar</a>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+const API = "http://localhost:8080/reservas";
+
+const form = document.getElementById("formEditar");
+
+// 🔄 Carregar dados
+fetch(`${API}`)
+.then(res => res.json())
+.then(lista => {
+    const r = lista.find(x => x.id == id);
+    if (!r) return alert("Reserva não encontrada");
+
+    form.nome.value = r.nome;
+    form.telefone.value = r.telefone;
+    form.checkin.value = r.checkin;
+    form.checkout.value = r.checkout;
+    form.tipoQuarto.value = r.tipoQuarto ?? "";
+    form.quantidadePessoas.value = r.quantidadePessoas ?? "";
+    form.valorTotal.value = r.valorTotal ?? "";
+    form.valorPago.value = r.valorPago ?? "";
+    form.status.value = r.status;
+});
+
+// 💾 Salvar alterações
+form.addEventListener("submit", e => {
+    e.preventDefault();
+
+    const dados = {
+        nome: form.nome.value,
+        telefone: form.telefone.value,
+        checkin: form.checkin.value,
+        checkout: form.checkout.value,
+        tipoQuarto: form.tipoQuarto.value,
+        quantidadePessoas: form.quantidadePessoas.value,
+        valorTotal: form.valorTotal.value,
+        valorPago: form.valorPago.value,
+        status: form.status.value
+    };
+
+    fetch(`${API}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+    })
+    .then(res => {
+        if (!res.ok) throw new Error();
+        alert("Reserva atualizada!");
+        window.location.href = "lista.html";
+    })
+    .catch(() => alert("Erro ao atualizar reserva"));
+});
+</script>
+
+</body>
+</html>

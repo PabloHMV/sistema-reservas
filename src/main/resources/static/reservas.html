@@ -1,0 +1,29 @@
+<h2>Nova Reserva</h2>
+
+<input id="nome" placeholder="Nome"><br>
+<input id="telefone" placeholder="Telefone"><br>
+<input type="date" id="checkin"><br>
+<input type="date" id="checkout"><br>
+<input id="valorTotal" placeholder="Total"><br>
+<input id="valorPago" placeholder="Pago"><br>
+
+<button onclick="salvar()">Salvar</button>
+<a href="lista.html">Lista</a>
+
+<script>
+async function salvar(){
+    await fetch("http://localhost:8080/reservas",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json"},
+        body:JSON.stringify({
+            nome:nome.value,
+            telefone:telefone.value,
+            checkin:checkin.value,
+            checkout:checkout.value,
+            valorTotal:Number(valorTotal.value),
+            valorPago:Number(valorPago.value)
+        })
+    })
+    alert("Salvo");
+}
+</script>

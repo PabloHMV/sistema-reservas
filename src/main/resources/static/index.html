@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Nova Reserva</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f3f4f6;
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+}
+
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+form {
+    display: grid;
+    gap: 12px;
+}
+
+input, select, button {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1d4ed8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>📋 Nova Reserva</h2>
+
+<form id="formReserva">
+
+<input name="nome" placeholder="Nome" required>
+<input name="telefone" placeholder="Telefone" required>
+
+<input name="cpfCnpj" placeholder="CPF / CNPJ (opcional)">
+
+<input type="date" name="checkin" required>
+<input type="date" name="checkout" required>
+
+<input name="tipoQuarto" placeholder="Tipo do quarto">
+<input type="number" name="numeroQuarto" placeholder="Número do quarto">
+
+<input type="number" name="quantidadePessoas" placeholder="Qtd pessoas">
+
+<input type="number" step="0.01" name="valorTotal" placeholder="Valor total">
+<input type="number" step="0.01" name="valorPago" placeholder="Valor pago">
+
+<select name="status">
+    <option value="RESERVADO">Reservado</option>
+    <option value="AGUARDANDO">Aguardando retorno</option>
+    <option value="CANCELADO">Cancelado</option>
+</select>
+
+<button type="submit">Salvar Reserva</button>
+</form>
+</div>
+
+<a href="lista.html">Lista de Reservas</a>
+
+<script>
+document.getElementById("formReserva").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const f = e.target;
+
+    const dados = {
+        nome: f.nome.value,
+        telefone: f.telefone.value,
+        cpfCnpj: f.cpfCnpj.value || null,
+        checkin: f.checkin.value,
+        checkout: f.checkout.value,
+        tipoQuarto: f.tipoQuarto.value || null,
+numeroQuarto: f.numeroQuarto.value
+    ? Number(f.numeroQuarto.value)
+    : null,
+
+        quantidadePessoas: f.quantidadePessoas.value
+            ? Number(f.quantidadePessoas.value)
+            : null,
+        valorTotal: f.valorTotal.value
+            ? Number(f.valorTotal.value)
+            : 0,
+        valorPago: f.valorPago.value
+            ? Number(f.valorPago.value)
+            : 0,
+        status: f.status.value
+    };
+
+    fetch("http://localhost:8080/reservas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+    })
+    .then(async res => {
+        if (!res.ok) {
+            const msg = await res.text();
+            throw new Error(msg || "Erro ao salvar reserva");
+        }
+        alert("Reserva cadastrada com sucesso!");
+        window.location.href = "lista.html";
+    })
+    .catch(err => {
+        alert(err.message.includes("quarto")
+            ? "❌ Este quarto já está reservado nesse período"
+            : "Erro ao salvar reserva"
+        );
+    });
+});
+</script>
+
+</body>
+</html>

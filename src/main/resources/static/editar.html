@@ -2,427 +2,481 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Editar Reserva</title>
 
 <style>
-:root{
-  --bg:#f3f4f6;
-  --card:#ffffff;
-  --text:#111827;
-  --muted:#6b7280;
-  --line:#e5e7eb;
-  --primary:#2563eb;
-  --primary2:#1d4ed8;
-  --danger:#dc2626;
-  --shadow: 0 10px 25px rgba(0,0,0,0.10);
-}
-
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family: Arial, sans-serif;
-  background: var(--bg);
-  padding: 28px 14px;
-  color: var(--text);
-}
-
-.wrap{
-  max-width: 980px;
-  margin: 0 auto;
-}
-
-.header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom: 14px;
-}
-
-h2{
-  margin:0;
-  font-size: 22px;
-}
-
-.badge{
-  font-size:12px;
-  color: var(--muted);
-  background:#eef2ff;
-  border:1px solid #c7d2fe;
-  padding:6px 10px;
-  border-radius:999px;
-}
-
-form{
-  background: var(--card);
-  padding: 18px;
-  border-radius: 14px;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--line);
-}
-
-.grid{
-  display:grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-}
-
-@media (min-width: 860px){
-  .grid{
-    grid-template-columns: 1fr 1fr;
+  :root{
+    --bg:#0b1220;
+    --card:#0f1a30;
+    --muted:#93a4c7;
+    --text:#e8eeff;
+    --line:rgba(255,255,255,.10);
+    --brand:#4f7cff;
+    --brand2:#2f62ff;
+    --danger:#ff4d4d;
+    --shadow: 0 18px 45px rgba(0,0,0,.45);
+    --radius: 18px;
   }
-}
 
-.card{
-  border:1px solid var(--line);
-  border-radius: 14px;
-  padding: 14px;
-  background: #fff;
-}
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(1200px 600px at 20% 10%, rgba(79,124,255,.18), transparent 60%),
+      radial-gradient(900px 500px at 80% 20%, rgba(43,213,118,.12), transparent 55%),
+      radial-gradient(700px 450px at 55% 90%, rgba(255,77,77,.10), transparent 60%),
+      var(--bg);
+    min-height:100vh;
+    padding:24px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
 
-.card-title{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin:0 0 10px 0;
-  font-size: 14px;
-  font-weight: 700;
-}
+  .wrap{
+    width:100%;
+    max-width:980px;
+    display:grid;
+    gap:18px;
+  }
 
-.card-sub{
-  margin:0 0 10px 0;
-  font-size: 12px;
-  color: var(--muted);
-}
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
 
-.field{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  margin-bottom: 12px;
-}
+  .title{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .title h1{
+    margin:0;
+    font-size:22px;
+    letter-spacing:.2px;
+  }
+  .title p{
+    margin:0;
+    color:var(--muted);
+    font-size:13px;
+  }
 
-label{
-  font-size: 12px;
-  color: var(--muted);
-}
+  .actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
 
-input, select{
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid var(--line);
-  font-size: 14px;
-  outline: none;
-  background:#fff;
-}
+  .btn{
+    appearance:none;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.06);
+    color:var(--text);
+    padding:10px 14px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:800;
+    font-size:14px;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transition: .15s ease;
+    user-select:none;
+  }
+  .btn:hover{ transform: translateY(-1px); border-color:rgba(255,255,255,.18); }
+  .btn:active{ transform: translateY(0); }
+  .btn.primary{
+    border:0;
+    background: linear-gradient(135deg, var(--brand), var(--brand2));
+    box-shadow: 0 12px 30px rgba(79,124,255,.25);
+  }
 
-input:focus, select:focus{
-  border-color: rgba(37,99,235,.55);
-  box-shadow: 0 0 0 4px rgba(37,99,235,.12);
-}
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow:hidden;
+  }
 
-.row{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
+  .cardHead{
+    padding:16px 18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    border-bottom:1px solid var(--line);
+  }
 
-@media (max-width: 420px){
-  .row{ grid-template-columns: 1fr; }
-}
+  .badge{
+    font-size:12px;
+    padding:6px 10px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    color:var(--muted);
+    background: rgba(255,255,255,.06);
+    white-space:nowrap;
+  }
 
-.actions{
-  display:flex;
-  gap:10px;
-  flex-wrap: wrap;
-  margin-top: 6px;
-}
+  form{
+    padding:18px;
+    display:grid;
+    gap:14px;
+  }
 
-button{
-  padding: 11px 14px;
-  border:none;
-  border-radius: 10px;
-  cursor:pointer;
-  font-weight: 700;
-  font-size: 14px;
-}
+  .msg{
+    display:none;
+    padding:12px 12px;
+    border-radius: 14px;
+    border:1px solid var(--line);
+    background: rgba(255,255,255,.06);
+    font-size:13px;
+    line-height:1.35;
+  }
+  .msg.show{ display:block; }
+  .msg.ok{ border-color: rgba(43,213,118,.25); }
+  .msg.err{ border-color: rgba(255,77,77,.28); }
 
-.btn-primary{
-  background: var(--primary);
-  color: #fff;
-}
-.btn-primary:hover{ background: var(--primary2); }
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:12px;
+  }
+  @media (min-width: 860px){
+    .grid{ grid-template-columns: repeat(2, 1fr); }
+    .span2{ grid-column: span 2; }
+  }
 
-.btn-ghost{
-  background: #f9fafb;
-  border: 1px solid var(--line);
-  color: #111827;
-}
-.btn-ghost:hover{ background:#f3f4f6; }
+  label{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    font-size:13px;
+    color:var(--muted);
+  }
 
-.voltar{
-  display:inline-block;
-  margin-top: 12px;
-  text-decoration:none;
-  font-weight:700;
-  color: var(--primary);
-}
+  input, select{
+    width:100%;
+    padding:12px 12px;
+    border-radius: 12px;
+    border:1px solid var(--line);
+    background: rgba(10,16,30,.65);
+    color: var(--text);
+    outline:none;
+    transition:.15s ease;
+    font-size:14px;
+  }
+  input::placeholder{ color: rgba(147,164,199,.7); }
+  input:focus, select:focus{
+    border-color: rgba(79,124,255,.55);
+    box-shadow: 0 0 0 4px rgba(79,124,255,.14);
+  }
 
-.msg{
-  margin-top: 10px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid var(--line);
-  background: #f9fafb;
-  color: var(--muted);
-  font-size: 13px;
-  display:none;
-}
+  /* Card “bonitão” pro número do quarto */
+  .roomCard{
+    grid-column: span 2;
+    border:1px solid rgba(79,124,255,.25);
+    background: radial-gradient(900px 220px at 20% 10%, rgba(79,124,255,.18), transparent 60%),
+                rgba(255,255,255,.04);
+    border-radius: 16px;
+    padding: 14px;
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+  }
+  .roomIcon{
+    width:44px;height:44px;
+    border-radius:14px;
+    display:grid;place-items:center;
+    background: rgba(79,124,255,.18);
+    border:1px solid rgba(255,255,255,.10);
+    flex:0 0 auto;
+    font-size:18px;
+  }
+  .roomContent{ flex:1; display:grid; gap:8px; }
+  .roomTitle{ color:var(--text); font-weight:900; font-size:14px; }
+  .roomHint{ color:var(--muted); font-size:12px; line-height:1.35; }
 
-.msg.show{ display:block; }
-
-.quarto-pill{
-  font-size:12px;
-  padding:6px 10px;
-  border-radius:999px;
-  border:1px solid #fde68a;
-  background:#fffbeb;
-  color:#92400e;
-}
+  .row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+    padding-top:6px;
+    border-top:1px solid var(--line);
+    margin-top:2px;
+  }
+  .hint{
+    font-size:12px;
+    color:var(--muted);
+    line-height:1.35;
+  }
+  .footerBtns{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+  .btn[disabled]{
+    opacity:.65;
+    cursor:not-allowed;
+    transform:none !important;
+  }
 </style>
 </head>
 
 <body>
   <div class="wrap">
-    <div class="header">
-      <h2>✏️ Editar Reserva</h2>
-      <span class="badge" id="badgeId">ID: -</span>
+    <div class="topbar">
+      <div class="title">
+        <h1>✏️ Editar Reserva</h1>
+        <p>Atualize os dados e salve. (Railway/local: API na mesma origem)</p>
+      </div>
+
+      <div class="actions">
+        <a class="btn" href="lista.html">⬅ Voltar</a>
+        <button class="btn primary" type="button" onclick="document.getElementById('formEditar').requestSubmit()">
+          💾 Salvar
+        </button>
+      </div>
     </div>
 
-    <form id="formEditar">
-      <div class="grid">
+    <div class="card">
+      <div class="cardHead">
+        <span class="badge">Reserva ID: <span id="badgeId">-</span></span>
+        <span class="badge" id="apiBadge">API: mesma origem</span>
+      </div>
 
-        <!-- CARD: Cliente -->
-        <div class="card">
-          <div class="card-title">👤 Dados do Cliente</div>
+      <form id="formEditar" autocomplete="off">
+        <div class="msg" id="msgBox"></div>
 
-          <div class="field">
-            <label>Nome</label>
-            <input name="nome" placeholder="Nome" required>
-          </div>
+        <div class="grid">
+          <label class="span2">
+            Nome *
+            <input name="nome" placeholder="Ex: João Silva" required />
+          </label>
 
-          <div class="field">
-            <label>Telefone</label>
-            <input name="telefone" placeholder="Telefone" required>
-          </div>
-        </div>
+          <label>
+            Telefone *
+            <input name="telefone" placeholder="(31) 99999-9999" required />
+          </label>
 
-        <!-- CARD: QUARTO (BONITÃO) -->
-        <div class="card">
-          <div class="card-title">
-            🏨 Quarto
-            <span class="quarto-pill" id="pillQuarto">Sem número</span>
-          </div>
-          <p class="card-sub">Preencha o número do quarto se quiser controlar conflitos no mesmo período.</p>
+          <label>
+            CPF / CNPJ (opcional)
+            <input name="cpfCnpj" placeholder="Somente números" inputmode="numeric" />
+          </label>
 
-          <div class="row">
-            <div class="field">
-              <label>Tipo do quarto</label>
-              <input name="tipoQuarto" placeholder="Ex: Standard, Luxo, Suíte...">
-            </div>
+          <label>
+            Check-in *
+            <input type="date" name="checkin" required />
+          </label>
 
-            <div class="field">
-              <label>Número do quarto (opcional)</label>
-              <input type="number" name="numeroQuarto" placeholder="Ex: 101" min="1">
-            </div>
-          </div>
-        </div>
+          <label>
+            Check-out *
+            <input type="date" name="checkout" required />
+          </label>
 
-        <!-- CARD: Datas -->
-        <div class="card">
-          <div class="card-title">📅 Datas</div>
+          <label class="span2">
+            Tipo do quarto (opcional)
+            <input name="tipoQuarto" placeholder="Ex: Standard / Luxo / Suíte" />
+          </label>
 
-          <div class="row">
-            <div class="field">
-              <label>Check-in</label>
-              <input type="date" name="checkin" required>
-            </div>
-            <div class="field">
-              <label>Check-out</label>
-              <input type="date" name="checkout" required>
-            </div>
-          </div>
-
-          <div class="field">
-            <label>Quantidade de pessoas</label>
-            <input type="number" name="quantidadePessoas" placeholder="Ex: 2" min="1">
-          </div>
-        </div>
-
-        <!-- CARD: Valores / Status -->
-        <div class="card">
-          <div class="card-title">💰 Valores e Status</div>
-
-          <div class="row">
-            <div class="field">
-              <label>Valor total</label>
-              <input type="number" step="0.01" name="valorTotal" placeholder="Ex: 450.00" min="0">
-            </div>
-            <div class="field">
-              <label>Valor pago</label>
-              <input type="number" step="0.01" name="valorPago" placeholder="Ex: 150.00" min="0">
+          <!-- ✅ Card bonitão do número do quarto -->
+          <div class="roomCard">
+            <div class="roomIcon">🏨</div>
+            <div class="roomContent">
+              <div class="roomTitle">Número do quarto</div>
+              <div class="roomHint">
+                Se você informar o número do quarto, o sistema consegue validar conflitos de datas por quarto.
+                Se não tiver, pode deixar em branco.
+              </div>
+              <label style="margin:0; color: var(--muted);">
+                Número do quarto (opcional)
+                <input type="number" name="numeroQuarto" placeholder="Ex: 213" />
+              </label>
             </div>
           </div>
 
-          <div class="field">
-            <label>Status</label>
-            <select name="status">
+          <label>
+            Qtd. pessoas (opcional)
+            <input type="number" name="quantidadePessoas" placeholder="Ex: 2" />
+          </label>
+
+          <label>
+            Valor total (R$)
+            <input type="number" step="0.01" name="valorTotal" placeholder="Ex: 450.00" />
+          </label>
+
+          <label>
+            Valor pago (R$)
+            <input type="number" step="0.01" name="valorPago" placeholder="Ex: 100.00" />
+          </label>
+
+          <label class="span2">
+            Status *
+            <select name="status" required>
               <option value="RESERVADO">Reservado</option>
               <option value="AGUARDANDO">Aguardando retorno</option>
               <option value="CANCELADO">Cancelado</option>
             </select>
-          </div>
+          </label>
         </div>
 
-      </div>
+        <div class="row">
+          <div class="hint">
+            Dica: no Railway, deixe o front usando <b>/reservas</b> (sem localhost).
+          </div>
 
-      <div class="actions">
-        <button class="btn-primary" type="submit">Salvar Alterações</button>
-        <button class="btn-ghost" type="button" onclick="window.location.href='lista.html'">Cancelar</button>
-      </div>
-
-      <div class="msg" id="msg"></div>
-
-      <a href="lista.html" class="voltar">⬅ Voltar</a>
-    </form>
+          <div class="footerBtns">
+            <button class="btn" type="reset">🧹 Reset</button>
+            <button class="btn primary" id="btnSubmit" type="submit">💾 Salvar Alterações</button>
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
 
 <script>
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
 
-  // ✅ IMPORTANTE:
-  // no Railway NÃO é localhost.
-  // Se o front estiver no MESMO domínio do back, isso funciona perfeito:
+  const form = document.getElementById("formEditar");
+  const btnSubmit = document.getElementById("btnSubmit");
+  const msgBox = document.getElementById("msgBox");
+
+  // ✅ Railway/local: mesma origem
   const API = "/reservas";
 
-  const form = document.getElementById("formEditar");
-  const badgeId = document.getElementById("badgeId");
-  const msg = document.getElementById("msg");
-  const pillQuarto = document.getElementById("pillQuarto");
+  document.getElementById("apiBadge").textContent = 'API: ${location.origin}';
+  document.getElementById("badgeId").textContent = id ?? "-";
 
-  if (!id) {
-    alert("ID não informado na URL. Ex: editar.html?id=1");
+  function showMsg(type, text){
+    msgBox.className = "msg show " + (type === "ok" ? "ok" : "err");
+    msgBox.textContent = text;
+  }
+  function clearMsg(){
+    msgBox.className = "msg";
+    msgBox.textContent = "";
   }
 
-  badgeId.textContent = 'ID: ${id}';
-
-  function showMsg(text, isError=false){
-    msg.textContent = text;
-    msg.style.background = isError ? "#fef2f2" : "#f0f9ff";
-    msg.style.borderColor = isError ? "#fecaca" : "#bae6fd";
-    msg.style.color = isError ? "#991b1b" : "#0c4a6e";
-    msg.classList.add("show");
+  function toNumberOrNull(v){
+    const s = String(v ?? "").trim();
+    if(!s) return null;
+    const n = Number(s);
+    return Number.isFinite(n) ? n : null;
   }
 
-  function atualizarPillQuarto(valor){
-    const v = (valor === null || valor === undefined || valor === "") ? "" : String(valor);
-    if (!v) {
-      pillQuarto.textContent = "Sem número";
-      pillQuarto.style.borderColor = "#e5e7eb";
-      pillQuarto.style.background = "#f9fafb";
-      pillQuarto.style.color = "#6b7280";
-    } else {
-      pillQuarto.textContent = 'Quarto ${v}';
-      pillQuarto.style.borderColor = "#86efac";
-      pillQuarto.style.background = "#f0fdf4";
-      pillQuarto.style.color = "#166534";
+  async function carregarReserva(){
+    if(!id){
+      showMsg("err", "❌ ID não informado na URL. Abra pelo botão Editar na lista.");
+      return;
+    }
+
+    try{
+      // Melhor: buscar a reserva específica
+      const res = await fetch('${API}/${id}');
+      if(!res.ok){
+        // fallback: se seu backend não tiver GET /reservas/{id}, tenta lista
+        const res2 = await fetch(API);
+        if(!res2.ok) throw new Error("Falha ao carregar reservas");
+        const lista = await res2.json();
+        const r = lista.find(x => String(x.id) === String(id));
+        if(!r) throw new Error("Reserva não encontrada");
+        preencher(r);
+        return;
+      }
+      const r = await res.json();
+      preencher(r);
+
+    }catch(err){
+      console.error(err);
+      showMsg("err", "❌ Não consegui carregar a reserva. Verifique se a API está online.");
     }
   }
 
-  // 🔄 Carregar dados (bem melhor do que buscar a lista toda)
-  fetch('${API}/${id}')
-    .then(async res => {
-      if (!res.ok) throw new Error(await res.text() || "Erro ao carregar reserva");
-      return res.json();
-    })
-    .then(r => {
-      form.nome.value = r.nome ?? "";
-      form.telefone.value = r.telefone ?? "";
-      form.checkin.value = r.checkin ?? "";
-      form.checkout.value = r.checkout ?? "";
-      form.tipoQuarto.value = r.tipoQuarto ?? "";
-      form.numeroQuarto.value = (r.numeroQuarto ?? "");
-      form.quantidadePessoas.value = (r.quantidadePessoas ?? "");
-      form.valorTotal.value = (r.valorTotal ?? "");
-      form.valorPago.value = (r.valorPago ?? "");
-      form.status.value = r.status ?? "RESERVADO";
-      atualizarPillQuarto(r.numeroQuarto ?? "");
-    })
-    .catch(err => {
-      showMsg(err.message || "Erro ao carregar reserva", true);
-    });
+  function preencher(r){
+    form.nome.value = r.nome ?? "";
+    form.telefone.value = r.telefone ?? "";
+    form.cpfCnpj.value = r.cpfCnpj ?? "";
+    form.checkin.value = r.checkin ?? "";
+    form.checkout.value = r.checkout ?? "";
+    form.tipoQuarto.value = r.tipoQuarto ?? "";
+    form.numeroQuarto.value = (r.numeroQuarto ?? "");
+    form.quantidadePessoas.value = (r.quantidadePessoas ?? "");
+    form.valorTotal.value = (r.valorTotal ?? "");
+    form.valorPago.value = (r.valorPago ?? "");
+    form.status.value = (r.status ?? "RESERVADO");
+  }
 
-  // Atualiza a pill conforme digita
-  form.numeroQuarto.addEventListener("input", () => {
-    atualizarPillQuarto(form.numeroQuarto.value);
-  });
-
-  // 💾 Salvar alterações
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    clearMsg();
 
-    // validação básica de datas
-    if (form.checkout.value && form.checkin.value && form.checkout.value <= form.checkin.value) {
-      showMsg("Check-out deve ser maior que o check-in.", true);
+    // validação simples de datas
+    const checkin = form.checkin.value;
+    const checkout = form.checkout.value;
+    if (checkin && checkout && checkout <= checkin){
+      showMsg("err", "❌ O Check-out precisa ser depois do Check-in.");
       return;
     }
 
     const dados = {
       nome: form.nome.value.trim(),
       telefone: form.telefone.value.trim(),
-      checkin: form.checkin.value,
-      checkout: form.checkout.value,
+      cpfCnpj: form.cpfCnpj.value.trim() || null,
+      checkin,
+      checkout,
       tipoQuarto: form.tipoQuarto.value.trim() || null,
-
-      // ✅ agora manda o número do quarto
-      numeroQuarto: form.numeroQuarto.value ? Number(form.numeroQuarto.value) : null,
-
-      quantidadePessoas: form.quantidadePessoas.value ? Number(form.quantidadePessoas.value) : null,
-      valorTotal: form.valorTotal.value ? Number(form.valorTotal.value) : 0,
-      valorPago: form.valorPago.value ? Number(form.valorPago.value) : 0,
+      numeroQuarto: toNumberOrNull(form.numeroQuarto.value),
+      quantidadePessoas: toNumberOrNull(form.quantidadePessoas.value),
+      valorTotal: toNumberOrNull(form.valorTotal.value) ?? 0,
+      valorPago: toNumberOrNull(form.valorPago.value) ?? 0,
       status: form.status.value
     };
 
-    try {
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = "Salvando...";
+
+    try{
       const res = await fetch('${API}/${id}', {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dados)
       });
 
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || "Erro ao atualizar reserva");
+      const bodyText = await res.text();
+
+      if(!res.ok){
+        let msg = bodyText || "Erro ao atualizar reserva";
+        if (msg.toLowerCase().includes("quarto") || msg.toLowerCase().includes("reservad")){
+          msg = "❌ Este quarto já está reservado nesse período.";
+        }
+        showMsg("err", msg);
+        return;
       }
 
-      showMsg("✅ Reserva atualizada com sucesso!");
-      setTimeout(() => window.location.href = "lista.html", 600);
+      showMsg("ok", "✅ Reserva atualizada! Voltando para a lista...");
+      setTimeout(() => window.location.href = "lista.html", 700);
 
-    } catch (err) {
-      const m = err.message || "Erro ao atualizar reserva";
-      // se sua API joga msg de conflito
-      if (m.toLowerCase().includes("quarto") && m.toLowerCase().includes("reserv")) {
-        showMsg("❌ Este quarto já está reservado nesse período.", true);
-      } else {
-        showMsg(m, true);
-      }
+    }catch(err){
+      console.error(err);
+      showMsg("err", "❌ Falha de conexão com a API. Verifique se o backend está online.");
+    }finally{
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = "💾 Salvar Alterações";
     }
   });
-</script>
 
+  carregarReserva();
+</script>
 </body>
 </html>

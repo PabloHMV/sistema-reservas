@@ -19,7 +19,6 @@
       --shadow: 0 18px 45px rgba(0,0,0,.45);
       --radius: 18px;
     }
-
     *{ box-sizing:border-box; }
     body{
       margin:0;
@@ -36,44 +35,28 @@
       align-items:center;
       justify-content:center;
     }
-
     .wrap{
       width:100%;
       max-width:980px;
       display:grid;
       gap:18px;
     }
-
     .topbar{
       display:flex;
       justify-content:space-between;
       align-items:center;
       gap:12px;
+      flex-wrap:wrap;
     }
-
-    .title{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-    }
-    .title h1{
-      margin:0;
-      font-size:22px;
-      letter-spacing:.2px;
-    }
-    .title p{
-      margin:0;
-      color:var(--muted);
-      font-size:13px;
-    }
-
+    .title{ display:flex; flex-direction:column; gap:4px; }
+    .title h1{ margin:0; font-size:22px; letter-spacing:.2px; }
+    .title p{ margin:0; color:var(--muted); font-size:13px; }
     .actions{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
       justify-content:flex-end;
     }
-
     .btn{
       appearance:none;
       border:1px solid var(--line);
@@ -98,6 +81,7 @@
       background: linear-gradient(135deg, var(--brand), var(--brand2));
       box-shadow: 0 12px 30px rgba(79,124,255,.25);
     }
+    .btn[disabled]{ opacity:.65; cursor:not-allowed; transform:none !important; }
 
     .card{
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
@@ -106,7 +90,6 @@
       box-shadow: var(--shadow);
       overflow:hidden;
     }
-
     .cardHead{
       padding:16px 18px;
       display:flex;
@@ -115,7 +98,6 @@
       gap:12px;
       border-bottom:1px solid var(--line);
     }
-
     .badge{
       font-size:12px;
       padding:6px 10px;
@@ -126,22 +108,10 @@
       white-space:nowrap;
     }
 
-    form{
-      padding:18px;
-      display:grid;
-      gap:14px;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:12px;
-    }
-
+    form{ padding:18px; display:grid; gap:14px; }
+    .grid{ display:grid; grid-template-columns: 1fr; gap:12px; }
     @media (min-width: 860px){
-      .grid{
-        grid-template-columns: repeat(2, 1fr);
-      }
+      .grid{ grid-template-columns: repeat(2, 1fr); }
       .span2{ grid-column: span 2; }
     }
 
@@ -195,6 +165,7 @@
       background: rgba(255,255,255,.06);
       font-size:13px;
       line-height:1.35;
+      white-space:pre-wrap;
     }
     .msg.show{ display:block; }
     .msg.ok{ border-color: rgba(43,213,118,.25); }
@@ -205,12 +176,6 @@
       gap:10px;
       flex-wrap:wrap;
       justify-content:flex-end;
-    }
-
-    .btn[disabled]{
-      opacity:.65;
-      cursor:not-allowed;
-      transform:none !important;
     }
   </style>
 </head>
@@ -234,7 +199,7 @@
     <div class="card">
       <div class="cardHead">
         <span class="badge">Sistema de Reservas</span>
-        <span class="badge" id="apiBadge">API: mesma origem</span>
+        <span class="badge" id="apiBadge">API: ...</span>
       </div>
 
       <form id="formReserva" autocomplete="off">
@@ -320,11 +285,13 @@
     const btnSubmit = document.getElementById("btnSubmit");
     const msgBox = document.getElementById("msgBox");
 
-    // ✅ URL fixa e correta: mesma origem (funciona local e Railway)
-    const API_BASE = ""; // deixe vazio mesmo
-    const ENDPOINT_RESERVAS = API_BASE + "/reservas";
+    // ✅ FIXO e “à prova de Railway”: mesma origem
+    // Se o front estiver no MESMO domínio do back, use "/reservas"
+    // (o mais recomendado no Railway se você está servindo o front pelo back)
+    const ENDPOINT_RESERVAS = "/reservas";
 
-    document.getElementById("apiBadge").textContent = 'API: ${location.origin}';
+    // ✅ corrigido: agora mostra a origem de verdade
+    document.getElementById("apiBadge").textContent = `API: ${location.origin}`;
 
     function showMsg(type, text){
       msgBox.className = "msg show " + (type === "ok" ? "ok" : "err");
@@ -336,8 +303,7 @@
     }
 
     function toNumberOrNull(v){
-      if (v === undefined || v === null) return null;
-      const s = String(v).trim();
+      const s = String(v ?? "").trim();
       if (!s) return null;
       const n = Number(s);
       return Number.isFinite(n) ? n : null;
@@ -349,9 +315,9 @@
 
       const f = e.target;
 
-      // validação simples de datas
       const checkin = f.checkin.value;
       const checkout = f.checkout.value;
+
       if (checkin && checkout && checkout <= checkin){
         showMsg("err", "❌ O Check-out precisa ser depois do Check-in.");
         return;
@@ -381,23 +347,20 @@
           body: JSON.stringify(dados)
         });
 
-        const contentType = res.headers.get("content-type") || "";
         const bodyText = await res.text();
 
         if (!res.ok){
-          // tenta mostrar mensagem vinda do backend
           let msg = bodyText || "Erro ao salvar reserva";
-          // deixa mais amigável
-          if (msg.toLowerCase().includes("quarto") || msg.toLowerCase().includes("reservad")){
+          const low = msg.toLowerCase();
+
+          if (low.includes("quarto") || low.includes("reservad")){
             msg = "❌ Este quarto já está reservado nesse período.";
+          } else if (low.includes("bad request") || low.includes("400")) {
+            msg = "❌ Dados inválidos. Verifique os campos e tente novamente.";
           }
+
           showMsg("err", msg);
           return;
-        }
-
-        // se o backend retornar JSON, ok — mas não é obrigatório
-        if (contentType.includes("application/json")) {
-          try { JSON.parse(bodyText); } catch {}
         }
 
         showMsg("ok", "✅ Reserva cadastrada com sucesso! Indo para a lista...");

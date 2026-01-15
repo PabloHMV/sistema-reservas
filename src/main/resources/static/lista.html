@@ -36,10 +36,7 @@
       padding: 18px;
     }
 
-    .wrap{
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+    .wrap{ max-width: 1200px; margin: 0 auto; }
 
     .topbar{
       display:flex;
@@ -49,11 +46,7 @@
       margin-bottom: 14px;
     }
 
-    .title{
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
+    .title{ display:flex; align-items:center; gap:10px; }
 
     .badge{
       width: 40px; height: 40px;
@@ -133,15 +126,8 @@
       background: rgba(0,0,0,.08);
     }
 
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
-    .label{
-      font-size: 12px;
-      color: var(--muted);
-    }
+    .field{ display:flex; flex-direction:column; gap:6px; }
+    .label{ font-size: 12px; color: var(--muted); }
 
     input, select{
       background: rgba(15,23,42,.75);
@@ -154,20 +140,11 @@
       transition: border-color .2s ease;
       width: 100%;
     }
-    input:focus, select:focus{
-      border-color: rgba(37,99,235,.65);
-    }
+    input:focus, select:focus{ border-color: rgba(37,99,235,.65); }
 
-    .tableWrap{
-      width: 100%;
-      overflow:auto;
-    }
+    .tableWrap{ width: 100%; overflow:auto; }
 
-    table{
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 980px;
-    }
+    table{ width: 100%; border-collapse: collapse; min-width: 980px; }
 
     thead th{
       position: sticky;
@@ -194,9 +171,7 @@
       white-space: nowrap;
     }
 
-    tbody tr:hover{
-      background: rgba(37,99,235,.06);
-    }
+    tbody tr:hover{ background: rgba(37,99,235,.06); }
 
     .mono{ font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
     .muted{ color: var(--muted); }
@@ -274,25 +249,17 @@
       display:flex;
       gap:10px;
       align-items:flex-start;
+      transition: .25s ease;
     }
     .toast .tDot{ width:10px; height:10px; border-radius:99px; margin-top: 4px; flex:0 0 auto;}
     .toast.ok .tDot{ background: var(--green); }
     .toast.warn .tDot{ background: var(--amber); }
     .toast.err .tDot{ background: var(--red); }
 
-    /* Responsivo */
     @media (max-width: 980px){
-      .filters{
-        grid-template-columns: 1fr 1fr;
-      }
-      .actions{
-        width:100%;
-        justify-content:flex-start;
-      }
-      .topbar{
-        flex-direction: column;
-        align-items:flex-start;
-      }
+      .filters{ grid-template-columns: 1fr 1fr; }
+      .actions{ width:100%; justify-content:flex-start; }
+      .topbar{ flex-direction: column; align-items:flex-start; }
     }
   </style>
 </head>
@@ -370,15 +337,15 @@
   </div>
 
   <script>
-    // ✅ Railway/local: usar URL relativa (sem localhost e sem porta)
+    // ✅ Railway/local (mesma origem): nada de localhost
     const API = "/reservas";
     let reservas = [];
 
     function toast(msg, type="ok"){
       const host = document.getElementById("toastHost");
       const el = document.createElement("div");
-      el.className = 'toast ${type === "err" ? "err" : type === "warn" ? "warn" : "ok"}';
-      el.innerHTML = '<span class="tDot"></span><div>${msg}</div>';
+      el.className = `toast ${type === "err" ? "err" : type === "warn" ? "warn" : "ok"}`;
+      el.innerHTML = `<span class="tDot"></span><div>${msg}</div>`;
       host.appendChild(el);
       setTimeout(() => { el.style.opacity = "0"; el.style.transform = "translateY(6px)"; }, 2800);
       setTimeout(() => el.remove(), 3400);
@@ -390,19 +357,18 @@
     }
 
     function fmtDate(iso){
-      // se já vier yyyy-mm-dd, mantém bonito
       if(!iso) return "-";
-      return iso;
+      return iso; // se quiser, depois eu formato bonitinho dd/mm/yyyy
     }
 
-    function statusPill(status){
+    function statusPillHtml(status){
       const s = (status || "").toUpperCase();
       let cls = "s-aguardando";
       let label = "Aguardando";
       if(s === "RESERVADO"){ cls = "s-reservado"; label = "Reservado"; }
       if(s === "CANCELADO"){ cls = "s-cancelado"; label = "Cancelado"; }
       if(s === "AGUARDANDO"){ cls = "s-aguardando"; label = "Aguardando"; }
-      return <span class="pill ${cls}"><span class="dot"></span>${label}</span>;
+      return `<span class="pill ${cls}"><span class="dot"></span>${label}</span>`;
     }
 
     function renderizar(lista){
@@ -431,12 +397,12 @@
           <td class="mono">${fmtMoney(total)}</td>
           <td class="mono">${fmtMoney(pago)}</td>
           <td class="mono ${classeValor}">${fmtMoney(restante)}</td>
-          <td>${statusPill(r.status)}</td>
+          <td>${statusPillHtml(r.status)}</td>
           <td>
             <div class="rowActions">
-              <button class="mini voucher" onclick="voucher(${r.id})">Voucher</button>
-              <button class="mini editar" onclick="editar(${r.id})">Editar</button>
-              <button class="mini excluir" onclick="excluirReserva(${r.id})">Excluir</button>
+              <button class="mini voucher" data-id="${r.id}">Voucher</button>
+              <button class="mini editar" data-id="${r.id}">Editar</button>
+              <button class="mini excluir" data-id="${r.id}">Excluir</button>
             </div>
           </td>
         `;
@@ -446,19 +412,33 @@
       document.getElementById("statusInfo").textContent =
         lista.length ? "Pronto ✅" : "Nenhuma reserva encontrada.";
       document.getElementById("countInfo").textContent =
-        '${lista.length} reserva(s) exibida(s)';
+        `${lista.length} reserva(s) exibida(s)`;
+
+      // bind dos botões (evita problemas com onclick em template)
+      document.querySelectorAll(".mini.voucher").forEach(btn=>{
+        btn.addEventListener("click", () => voucher(btn.dataset.id));
+      });
+      document.querySelectorAll(".mini.editar").forEach(btn=>{
+        btn.addEventListener("click", () => editar(btn.dataset.id));
+      });
+      document.querySelectorAll(".mini.excluir").forEach(btn=>{
+        btn.addEventListener("click", () => excluirReserva(btn.dataset.id));
+      });
     }
 
     async function carregar(){
       document.getElementById("statusInfo").textContent = "Carregando reservas...";
       try{
         const res = await fetch(API);
-        if(!res.ok) throw new Error("Falha ao buscar reservas");
+        if(!res.ok){
+          const t = await res.text();
+          throw new Error(t || "Falha ao buscar reservas");
+        }
         reservas = await res.json();
         renderizar(reservas);
       }catch(err){
         console.error(err);
-        toast("Erro ao carregar reservas.", "err");
+        toast("Erro ao carregar reservas. Verifique se a rota GET /reservas está ok.", "err");
         document.getElementById("statusInfo").textContent = "Erro ao carregar.";
         document.getElementById("countInfo").textContent = "";
       }
@@ -471,18 +451,11 @@
 
       let filtrado = [...reservas];
 
-      if(nome){
-        filtrado = filtrado.filter(r => (r.nome || "").toLowerCase().includes(nome));
-      }
-      if(status){
-        filtrado = filtrado.filter(r => (r.status || "") === status);
-      }
-      if(data){
-        filtrado = filtrado.filter(r => (r.checkin <= data && r.checkout >= data));
-      }
+      if(nome) filtrado = filtrado.filter(r => (r.nome || "").toLowerCase().includes(nome));
+      if(status) filtrado = filtrado.filter(r => (r.status || "") === status);
+      if(data) filtrado = filtrado.filter(r => (r.checkin <= data && r.checkout >= data));
 
       renderizar(filtrado);
-      toast("Filtro aplicado ✅", "ok");
     }
 
     function limparFiltro(){
@@ -496,8 +469,11 @@
     async function excluirReserva(id){
       if(!confirm("Deseja excluir esta reserva?")) return;
       try{
-        const res = await fetch('${API}/${id}', { method:"DELETE" });
-        if(!res.ok) throw new Error("Falha ao excluir");
+        const res = await fetch(`${API}/${id}`, { method:"DELETE" });
+        if(!res.ok){
+          const t = await res.text();
+          throw new Error(t || "Falha ao excluir");
+        }
         toast("Reserva excluída ✅", "ok");
         await carregar();
       }catch(err){
@@ -507,24 +483,17 @@
     }
 
     function voucher(id){
-      window.open('${API}/voucher/${id}', "_blank");
+      window.open(`${API}/voucher/${id}`, "_blank");
     }
     function editar(id){
-      window.location.href = 'editar.html?id=${id}';
+      window.location.href = `editar.html?id=${id}`;
     }
 
-    // Eventos
     document.getElementById("btnFiltrar").addEventListener("click", aplicarFiltro);
     document.getElementById("btnLimpar").addEventListener("click", limparFiltro);
     document.getElementById("btnRecarregar").addEventListener("click", carregar);
+    document.getElementById("filtroNome").addEventListener("input", aplicarFiltro);
 
-    // Filtrar ao digitar
-    document.getElementById("filtroNome").addEventListener("input", () => {
-      // não força muito; aplica filtro “leve”
-      aplicarFiltro();
-    });
-
-    // start
     carregar();
   </script>
 </body>

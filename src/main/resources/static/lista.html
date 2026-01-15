@@ -1,232 +1,531 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>Lista de Reservas</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lista de Reservas</title>
 
-<style>
-body {
-    font-family: Arial, sans-serif;
-    background: #f3f4f6;
-    padding: 40px;
-}
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#0f172a;
+      --card2:#111c33;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --line:rgba(255,255,255,.10);
+      --primary:#2563eb;
+      --primary2:#1d4ed8;
+      --green:#16a34a;
+      --amber:#f59e0b;
+      --red:#dc2626;
+      --shadow: 0 18px 45px rgba(0,0,0,.35);
+      --radius:16px;
+    }
 
-h2 {
-    text-align: center;
-    margin-bottom: 20px;
-}
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(37,99,235,.25), transparent 55%),
+        radial-gradient(900px 450px at 90% 20%, rgba(22,163,74,.20), transparent 55%),
+        radial-gradient(900px 450px at 50% 90%, rgba(245,158,11,.12), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      padding: 18px;
+    }
 
-.filtros {
-    text-align: center;
-    margin-bottom: 20px;
-}
+    .wrap{
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
-.filtros select,
-.filtros input,
-.filtros button {
-    padding: 8px;
-    margin: 5px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-}
+    .topbar{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom: 14px;
+    }
 
-table {
-    width: 100%;
-    background: white;
-    border-collapse: collapse;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
+    .title{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
 
-th, td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    text-align: center;
-    font-size: 14px;
-}
+    .badge{
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      display:grid; place-items:center;
+      background: linear-gradient(135deg, rgba(37,99,235,.35), rgba(37,99,235,.10));
+      border:1px solid var(--line);
+      box-shadow: 0 10px 25px rgba(37,99,235,.15);
+      flex: 0 0 auto;
+    }
 
-th {
-    background: #2563eb;
-    color: white;
-}
+    h1{
+      margin:0;
+      font-size: 18px;
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
+    .subtitle{
+      margin:2px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
 
-button {
-    padding: 6px 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 12px;
-}
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
 
-.voucher {
-    background: #16a34a;
-    color: white;
-}
+    .btn{
+      border:none;
+      cursor:pointer;
+      font-weight: 700;
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: white;
+      background: linear-gradient(180deg, var(--primary), var(--primary2));
+      box-shadow: 0 12px 30px rgba(37,99,235,.25);
+      transition: transform .08s ease, filter .2s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size: 13px;
+      text-decoration:none;
+    }
+    .btn:hover{ filter: brightness(1.05); }
+    .btn:active{ transform: translateY(1px); }
+    .btn.secondary{
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--line);
+      box-shadow: none;
+      color: var(--text);
+    }
+    .btn.danger{
+      background: rgba(220,38,38,.15);
+      border:1px solid rgba(220,38,38,.35);
+      color: #fecaca;
+      box-shadow:none;
+    }
 
-.editar {
-    background: #f59e0b;
-    color: white;
-}
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
 
-.excluir {
-    background: #dc2626;
-    color: white;
-}
+    .filters{
+      padding: 14px;
+      display:grid;
+      grid-template-columns: 1fr 180px 180px auto auto;
+      gap: 10px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(0,0,0,.08);
+    }
 
-.valor-ok {
-    color: #16a34a;
-    font-weight: bold;
-}
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .label{
+      font-size: 12px;
+      color: var(--muted);
+    }
 
-.valor-atencao {
-    color: #f59e0b;
-    font-weight: bold;
-}
+    input, select{
+      background: rgba(15,23,42,.75);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      outline: none;
+      font-size: 13px;
+      transition: border-color .2s ease;
+      width: 100%;
+    }
+    input:focus, select:focus{
+      border-color: rgba(37,99,235,.65);
+    }
 
-.valor-pendente {
-    color: #dc2626;
-    font-weight: bold;
-}
+    .tableWrap{
+      width: 100%;
+      overflow:auto;
+    }
 
-.voltar {
-    margin-top: 20px;
-    display: block;
-    text-align: center;
-    text-decoration: none;
-    font-weight: bold;
-    color: #2563eb;
-}
-</style>
+    table{
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+
+    thead th{
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: rgba(17,28,51,.95);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--line);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: rgba(229,231,235,.9);
+      padding: 12px 10px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    tbody td{
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      font-size: 13px;
+      color: rgba(229,231,235,.95);
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    tbody tr:hover{
+      background: rgba(37,99,235,.06);
+    }
+
+    .mono{ font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .muted{ color: var(--muted); }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .dot{ width:8px; height:8px; border-radius:99px; }
+    .s-reservado .dot{ background: var(--green); }
+    .s-aguardando .dot{ background: var(--amber); }
+    .s-cancelado .dot{ background: var(--red); }
+
+    .money-ok{ color: #86efac; font-weight: 800; }
+    .money-warn{ color: #fde68a; font-weight: 800; }
+    .money-bad{ color: #fecaca; font-weight: 800; }
+
+    .rowActions{
+      display:flex;
+      gap:8px;
+      justify-content:flex-end;
+    }
+    .mini{
+      padding: 8px 10px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      cursor:pointer;
+    }
+    .mini.voucher{ border-color: rgba(22,163,74,.35); background: rgba(22,163,74,.12); color: #bbf7d0; }
+    .mini.editar{ border-color: rgba(245,158,11,.35); background: rgba(245,158,11,.12); color: #fde68a; }
+    .mini.excluir{ border-color: rgba(220,38,38,.35); background: rgba(220,38,38,.12); color: #fecaca; }
+
+    .footer{
+      padding: 12px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background: rgba(0,0,0,.06);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .toastHost{
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      z-index: 9999;
+    }
+    .toast{
+      min-width: 240px;
+      max-width: 360px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(17,28,51,.92);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+      color: var(--text);
+      font-size: 13px;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .toast .tDot{ width:10px; height:10px; border-radius:99px; margin-top: 4px; flex:0 0 auto;}
+    .toast.ok .tDot{ background: var(--green); }
+    .toast.warn .tDot{ background: var(--amber); }
+    .toast.err .tDot{ background: var(--red); }
+
+    /* Responsivo */
+    @media (max-width: 980px){
+      .filters{
+        grid-template-columns: 1fr 1fr;
+      }
+      .actions{
+        width:100%;
+        justify-content:flex-start;
+      }
+      .topbar{
+        flex-direction: column;
+        align-items:flex-start;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">
+        <div class="badge">📄</div>
+        <div>
+          <h1>Reservas</h1>
+          <div class="subtitle">Gerencie, filtre, edite e gere voucher das reservas</div>
+        </div>
+      </div>
 
-<h2>📄 Reservas</h2>
+      <div class="actions">
+        <a class="btn" href="index.html">➕ Nova Reserva</a>
+        <button class="btn secondary" id="btnRecarregar">↻ Recarregar</button>
+      </div>
+    </div>
 
-<!-- FILTROS -->
-<div class="filtros">
-    <input type="text" id="filtroNome" placeholder="Buscar por nome">
+    <div class="card">
+      <div class="filters">
+        <div class="field">
+          <div class="label">Buscar por nome</div>
+          <input type="text" id="filtroNome" placeholder="Ex: João, Maria..." />
+        </div>
 
-    <select id="filtroStatus">
-        <option value="">Todos os Status</option>
-        <option value="RESERVADO">Reservado</option>
-        <option value="AGUARDANDO">Aguardando</option>
-        <option value="CANCELADO">Cancelado</option>
-    </select>
+        <div class="field">
+          <div class="label">Status</div>
+          <select id="filtroStatus">
+            <option value="">Todos</option>
+            <option value="RESERVADO">Reservado</option>
+            <option value="AGUARDANDO">Aguardando retorno</option>
+            <option value="CANCELADO">Cancelado</option>
+          </select>
+        </div>
 
-    <input type="date" id="filtroData">
+        <div class="field">
+          <div class="label">Data dentro do período</div>
+          <input type="date" id="filtroData"/>
+        </div>
 
-    <button onclick="aplicarFiltro()">Filtrar</button>
-    <button onclick="location.reload()">Limpar</button>
-</div>
+        <button class="btn secondary" id="btnFiltrar">Filtrar</button>
+        <button class="btn danger" id="btnLimpar">Limpar</button>
+      </div>
 
-<table>
-<thead>
-<tr>
-    <th>Voucher</th>
-    <th>Nome</th>
-    <th>Quarto</th>
-    <th>Check-in</th>
-    <th>Check-out</th>
-    <th>Total</th>
-    <th>Pago</th>
-    <th>Restante</th>
-    <th>Status</th>
-    <th>Ações</th>
-</tr>
-</thead>
-<tbody id="tabela"></tbody>
-</table>
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Voucher</th>
+              <th>Nome</th>
+              <th>Quarto</th>
+              <th>Check-in</th>
+              <th>Check-out</th>
+              <th>Total</th>
+              <th>Pago</th>
+              <th>Restante</th>
+              <th>Status</th>
+              <th style="text-align:right;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabela"></tbody>
+        </table>
+      </div>
 
-<a href="index.html" class="voltar">➕ Nova Reserva</a>
+      <div class="footer">
+        <div id="statusInfo">Carregando reservas...</div>
+        <div class="mono muted" id="countInfo"></div>
+      </div>
+    </div>
 
-<script>
-const API = "http://localhost:8080/reservas";
-let reservas = [];
+    <div class="toastHost" id="toastHost"></div>
+  </div>
 
-fetch(API)
-.then(res => res.json())
-.then(dados => {
-    reservas = dados;
-    renderizar(dados);
-});
+  <script>
+    // ✅ Railway/local: usar URL relativa (sem localhost e sem porta)
+    const API = "/reservas";
+    let reservas = [];
 
-function renderizar(lista) {
-    const tabela = document.getElementById("tabela");
-    tabela.innerHTML = "";
+    function toast(msg, type="ok"){
+      const host = document.getElementById("toastHost");
+      const el = document.createElement("div");
+      el.className = 'toast ${type === "err" ? "err" : type === "warn" ? "warn" : "ok"}';
+      el.innerHTML = '<span class="tDot"></span><div>${msg}</div>';
+      host.appendChild(el);
+      setTimeout(() => { el.style.opacity = "0"; el.style.transform = "translateY(6px)"; }, 2800);
+      setTimeout(() => el.remove(), 3400);
+    }
 
-    lista.forEach(r => {
+    function fmtMoney(v){
+      const n = Number(v ?? 0);
+      return n.toLocaleString("pt-BR", { style:"currency", currency:"BRL" });
+    }
 
-        const restante = Number(r.valorTotal ?? 0) - Number(r.valorPago ?? 0);
+    function fmtDate(iso){
+      // se já vier yyyy-mm-dd, mantém bonito
+      if(!iso) return "-";
+      return iso;
+    }
 
-        let classeValor = "valor-ok";
-        if (restante > 0 && restante <= 100) classeValor = "valor-atencao";
-        if (restante > 100) classeValor = "valor-pendente";
+    function statusPill(status){
+      const s = (status || "").toUpperCase();
+      let cls = "s-aguardando";
+      let label = "Aguardando";
+      if(s === "RESERVADO"){ cls = "s-reservado"; label = "Reservado"; }
+      if(s === "CANCELADO"){ cls = "s-cancelado"; label = "Cancelado"; }
+      if(s === "AGUARDANDO"){ cls = "s-aguardando"; label = "Aguardando"; }
+      return <span class="pill ${cls}"><span class="dot"></span>${label}</span>;
+    }
 
-        tabela.innerHTML += `
-        <tr>
-            <td>${r.voucherNumero ?? "#" + r.id}</td>
-            <td>${r.nome}</td>
-            <td>${r.numeroQuarto ?? "-"}</td>
-            <td>${r.checkin}</td>
-            <td>${r.checkout}</td>
-            <td>R$ ${Number(r.valorTotal ?? 0).toFixed(2)}</td>
-            <td>R$ ${Number(r.valorPago ?? 0).toFixed(2)}</td>
-            <td class="${classeValor}">
-                R$ ${restante.toFixed(2)}
-            </td>
-            <td>${r.status}</td>
-            <td>
-                <button class="voucher" onclick="voucher(${r.id})">Voucher</button>
-                <button class="editar" onclick="editar(${r.id})">Editar</button>
-                <button class="excluir" onclick="excluir(${r.id})">Excluir</button>
-            </td>
-        </tr>`;
+    function renderizar(lista){
+      const tabela = document.getElementById("tabela");
+      tabela.innerHTML = "";
+
+      lista.forEach(r => {
+        const total = Number(r.valorTotal ?? 0);
+        const pago = Number(r.valorPago ?? 0);
+        const restante = total - pago;
+
+        let classeValor = "money-ok";
+        if (restante > 0 && restante <= 100) classeValor = "money-warn";
+        if (restante > 100) classeValor = "money-bad";
+
+        const voucher = r.voucherNumero ?? ("#" + r.id);
+        const quarto = (r.numeroQuarto ?? "-");
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="mono">${voucher}</td>
+          <td>${r.nome ?? "-"}</td>
+          <td class="mono">${quarto}</td>
+          <td class="mono">${fmtDate(r.checkin)}</td>
+          <td class="mono">${fmtDate(r.checkout)}</td>
+          <td class="mono">${fmtMoney(total)}</td>
+          <td class="mono">${fmtMoney(pago)}</td>
+          <td class="mono ${classeValor}">${fmtMoney(restante)}</td>
+          <td>${statusPill(r.status)}</td>
+          <td>
+            <div class="rowActions">
+              <button class="mini voucher" onclick="voucher(${r.id})">Voucher</button>
+              <button class="mini editar" onclick="editar(${r.id})">Editar</button>
+              <button class="mini excluir" onclick="excluirReserva(${r.id})">Excluir</button>
+            </div>
+          </td>
+        `;
+        tabela.appendChild(tr);
+      });
+
+      document.getElementById("statusInfo").textContent =
+        lista.length ? "Pronto ✅" : "Nenhuma reserva encontrada.";
+      document.getElementById("countInfo").textContent =
+        '${lista.length} reserva(s) exibida(s)';
+    }
+
+    async function carregar(){
+      document.getElementById("statusInfo").textContent = "Carregando reservas...";
+      try{
+        const res = await fetch(API);
+        if(!res.ok) throw new Error("Falha ao buscar reservas");
+        reservas = await res.json();
+        renderizar(reservas);
+      }catch(err){
+        console.error(err);
+        toast("Erro ao carregar reservas.", "err");
+        document.getElementById("statusInfo").textContent = "Erro ao carregar.";
+        document.getElementById("countInfo").textContent = "";
+      }
+    }
+
+    function aplicarFiltro(){
+      const nome = (document.getElementById("filtroNome").value || "").toLowerCase().trim();
+      const status = document.getElementById("filtroStatus").value;
+      const data = document.getElementById("filtroData").value;
+
+      let filtrado = [...reservas];
+
+      if(nome){
+        filtrado = filtrado.filter(r => (r.nome || "").toLowerCase().includes(nome));
+      }
+      if(status){
+        filtrado = filtrado.filter(r => (r.status || "") === status);
+      }
+      if(data){
+        filtrado = filtrado.filter(r => (r.checkin <= data && r.checkout >= data));
+      }
+
+      renderizar(filtrado);
+      toast("Filtro aplicado ✅", "ok");
+    }
+
+    function limparFiltro(){
+      document.getElementById("filtroNome").value = "";
+      document.getElementById("filtroStatus").value = "";
+      document.getElementById("filtroData").value = "";
+      renderizar(reservas);
+      toast("Filtros limpos.", "warn");
+    }
+
+    async function excluirReserva(id){
+      if(!confirm("Deseja excluir esta reserva?")) return;
+      try{
+        const res = await fetch('${API}/${id}', { method:"DELETE" });
+        if(!res.ok) throw new Error("Falha ao excluir");
+        toast("Reserva excluída ✅", "ok");
+        await carregar();
+      }catch(err){
+        console.error(err);
+        toast("Erro ao excluir reserva.", "err");
+      }
+    }
+
+    function voucher(id){
+      window.open('${API}/voucher/${id}', "_blank");
+    }
+    function editar(id){
+      window.location.href = 'editar.html?id=${id}';
+    }
+
+    // Eventos
+    document.getElementById("btnFiltrar").addEventListener("click", aplicarFiltro);
+    document.getElementById("btnLimpar").addEventListener("click", limparFiltro);
+    document.getElementById("btnRecarregar").addEventListener("click", carregar);
+
+    // Filtrar ao digitar
+    document.getElementById("filtroNome").addEventListener("input", () => {
+      // não força muito; aplica filtro “leve”
+      aplicarFiltro();
     });
-}
 
-function aplicarFiltro() {
-    const nome = document.getElementById("filtroNome").value.toLowerCase();
-    const status = document.getElementById("filtroStatus").value;
-    const data = document.getElementById("filtroData").value;
-
-    let filtrado = reservas;
-
-    if (nome) {
-        filtrado = filtrado.filter(r =>
-            r.nome.toLowerCase().includes(nome)
-        );
-    }
-
-    if (status) {
-        filtrado = filtrado.filter(r => r.status === status);
-    }
-
-    if (data) {
-        filtrado = filtrado.filter(r =>
-            r.checkin <= data && r.checkout >= data
-        );
-    }
-
-    renderizar(filtrado);
-}
-
-function excluir(id) {
-    if (!confirm("Deseja excluir esta reserva?")) return;
-
-    fetch(`${API}/${id}`, { method: "DELETE" })
-        .then(() => location.reload());
-}
-
-function voucher(id) {
-    window.open(`${API}/voucher/${id}`, "_blank");
-}
-
-function editar(id) {
-    window.location.href = `editar.html?id=${id}`;
-}
-</script>
-
+    // start
+    carregar();
+  </script>
 </body>
 </html>

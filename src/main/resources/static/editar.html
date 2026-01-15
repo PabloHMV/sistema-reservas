@@ -2,141 +2,426 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Editar Reserva</title>
 
 <style>
-body {
-    font-family: Arial, sans-serif;
-    background: #f3f4f6;
-    padding: 40px;
+:root{
+  --bg:#f3f4f6;
+  --card:#ffffff;
+  --text:#111827;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+  --primary:#2563eb;
+  --primary2:#1d4ed8;
+  --danger:#dc2626;
+  --shadow: 0 10px 25px rgba(0,0,0,0.10);
 }
 
-h2 {
-    text-align: center;
-    margin-bottom: 20px;
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  padding: 28px 14px;
+  color: var(--text);
 }
 
-form {
-    max-width: 600px;
-    margin: auto;
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+.wrap{
+  max-width: 980px;
+  margin: 0 auto;
 }
 
-input, select, button {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 12px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    font-size: 14px;
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom: 14px;
 }
 
-button {
-    background: #2563eb;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
+h2{
+  margin:0;
+  font-size: 22px;
 }
 
-button:hover {
-    opacity: 0.9;
+.badge{
+  font-size:12px;
+  color: var(--muted);
+  background:#eef2ff;
+  border:1px solid #c7d2fe;
+  padding:6px 10px;
+  border-radius:999px;
 }
 
-.voltar {
-    display: block;
-    margin-top: 15px;
-    text-align: center;
-    text-decoration: none;
-    font-weight: bold;
-    color: #2563eb;
+form{
+  background: var(--card);
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+@media (min-width: 860px){
+  .grid{
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.card{
+  border:1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+  background: #fff;
+}
+
+.card-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:0 0 10px 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.card-sub{
+  margin:0 0 10px 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-bottom: 12px;
+}
+
+label{
+  font-size: 12px;
+  color: var(--muted);
+}
+
+input, select{
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  font-size: 14px;
+  outline: none;
+  background:#fff;
+}
+
+input:focus, select:focus{
+  border-color: rgba(37,99,235,.55);
+  box-shadow: 0 0 0 4px rgba(37,99,235,.12);
+}
+
+.row{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 420px){
+  .row{ grid-template-columns: 1fr; }
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+button{
+  padding: 11px 14px;
+  border:none;
+  border-radius: 10px;
+  cursor:pointer;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.btn-primary{
+  background: var(--primary);
+  color: #fff;
+}
+.btn-primary:hover{ background: var(--primary2); }
+
+.btn-ghost{
+  background: #f9fafb;
+  border: 1px solid var(--line);
+  color: #111827;
+}
+.btn-ghost:hover{ background:#f3f4f6; }
+
+.voltar{
+  display:inline-block;
+  margin-top: 12px;
+  text-decoration:none;
+  font-weight:700;
+  color: var(--primary);
+}
+
+.msg{
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #f9fafb;
+  color: var(--muted);
+  font-size: 13px;
+  display:none;
+}
+
+.msg.show{ display:block; }
+
+.quarto-pill{
+  font-size:12px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid #fde68a;
+  background:#fffbeb;
+  color:#92400e;
 }
 </style>
 </head>
 
 <body>
+  <div class="wrap">
+    <div class="header">
+      <h2>✏️ Editar Reserva</h2>
+      <span class="badge" id="badgeId">ID: -</span>
+    </div>
 
-<h2>✏️ Editar Reserva</h2>
+    <form id="formEditar">
+      <div class="grid">
 
-<form id="formEditar">
-    <input name="nome" placeholder="Nome" required>
-    <input name="telefone" placeholder="Telefone" required>
+        <!-- CARD: Cliente -->
+        <div class="card">
+          <div class="card-title">👤 Dados do Cliente</div>
 
-    <input type="date" name="checkin" required>
-    <input type="date" name="checkout" required>
+          <div class="field">
+            <label>Nome</label>
+            <input name="nome" placeholder="Nome" required>
+          </div>
 
-    <input name="tipoQuarto" placeholder="Tipo de quarto">
-    <input type="number" name="quantidadePessoas" placeholder="Qtd pessoas">
+          <div class="field">
+            <label>Telefone</label>
+            <input name="telefone" placeholder="Telefone" required>
+          </div>
+        </div>
 
-    <input type="number" step="0.01" name="valorTotal" placeholder="Valor total">
-    <input type="number" step="0.01" name="valorPago" placeholder="Valor pago">
+        <!-- CARD: QUARTO (BONITÃO) -->
+        <div class="card">
+          <div class="card-title">
+            🏨 Quarto
+            <span class="quarto-pill" id="pillQuarto">Sem número</span>
+          </div>
+          <p class="card-sub">Preencha o número do quarto se quiser controlar conflitos no mesmo período.</p>
 
-    <select name="status">
-        <option value="RESERVADO">Reservado</option>
-        <option value="AGUARDANDO">Aguardando retorno</option>
-        <option value="CANCELADO">Cancelado</option>
-    </select>
+          <div class="row">
+            <div class="field">
+              <label>Tipo do quarto</label>
+              <input name="tipoQuarto" placeholder="Ex: Standard, Luxo, Suíte...">
+            </div>
 
-    <button type="submit">Salvar Alterações</button>
-</form>
+            <div class="field">
+              <label>Número do quarto (opcional)</label>
+              <input type="number" name="numeroQuarto" placeholder="Ex: 101" min="1">
+            </div>
+          </div>
+        </div>
 
-<a href="lista.html" class="voltar">⬅ Voltar</a>
+        <!-- CARD: Datas -->
+        <div class="card">
+          <div class="card-title">📅 Datas</div>
+
+          <div class="row">
+            <div class="field">
+              <label>Check-in</label>
+              <input type="date" name="checkin" required>
+            </div>
+            <div class="field">
+              <label>Check-out</label>
+              <input type="date" name="checkout" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Quantidade de pessoas</label>
+            <input type="number" name="quantidadePessoas" placeholder="Ex: 2" min="1">
+          </div>
+        </div>
+
+        <!-- CARD: Valores / Status -->
+        <div class="card">
+          <div class="card-title">💰 Valores e Status</div>
+
+          <div class="row">
+            <div class="field">
+              <label>Valor total</label>
+              <input type="number" step="0.01" name="valorTotal" placeholder="Ex: 450.00" min="0">
+            </div>
+            <div class="field">
+              <label>Valor pago</label>
+              <input type="number" step="0.01" name="valorPago" placeholder="Ex: 150.00" min="0">
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Status</label>
+            <select name="status">
+              <option value="RESERVADO">Reservado</option>
+              <option value="AGUARDANDO">Aguardando retorno</option>
+              <option value="CANCELADO">Cancelado</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" type="submit">Salvar Alterações</button>
+        <button class="btn-ghost" type="button" onclick="window.location.href='lista.html'">Cancelar</button>
+      </div>
+
+      <div class="msg" id="msg"></div>
+
+      <a href="lista.html" class="voltar">⬅ Voltar</a>
+    </form>
+  </div>
 
 <script>
-const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
-const API = "http://localhost:8080/reservas";
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
 
-const form = document.getElementById("formEditar");
+  // ✅ IMPORTANTE:
+  // no Railway NÃO é localhost.
+  // Se o front estiver no MESMO domínio do back, isso funciona perfeito:
+  const API = "/reservas";
 
-// 🔄 Carregar dados
-fetch(`${API}`)
-.then(res => res.json())
-.then(lista => {
-    const r = lista.find(x => x.id == id);
-    if (!r) return alert("Reserva não encontrada");
+  const form = document.getElementById("formEditar");
+  const badgeId = document.getElementById("badgeId");
+  const msg = document.getElementById("msg");
+  const pillQuarto = document.getElementById("pillQuarto");
 
-    form.nome.value = r.nome;
-    form.telefone.value = r.telefone;
-    form.checkin.value = r.checkin;
-    form.checkout.value = r.checkout;
-    form.tipoQuarto.value = r.tipoQuarto ?? "";
-    form.quantidadePessoas.value = r.quantidadePessoas ?? "";
-    form.valorTotal.value = r.valorTotal ?? "";
-    form.valorPago.value = r.valorPago ?? "";
-    form.status.value = r.status;
-});
+  if (!id) {
+    alert("ID não informado na URL. Ex: editar.html?id=1");
+  }
 
-// 💾 Salvar alterações
-form.addEventListener("submit", e => {
+  badgeId.textContent = 'ID: ${id}';
+
+  function showMsg(text, isError=false){
+    msg.textContent = text;
+    msg.style.background = isError ? "#fef2f2" : "#f0f9ff";
+    msg.style.borderColor = isError ? "#fecaca" : "#bae6fd";
+    msg.style.color = isError ? "#991b1b" : "#0c4a6e";
+    msg.classList.add("show");
+  }
+
+  function atualizarPillQuarto(valor){
+    const v = (valor === null || valor === undefined || valor === "") ? "" : String(valor);
+    if (!v) {
+      pillQuarto.textContent = "Sem número";
+      pillQuarto.style.borderColor = "#e5e7eb";
+      pillQuarto.style.background = "#f9fafb";
+      pillQuarto.style.color = "#6b7280";
+    } else {
+      pillQuarto.textContent = 'Quarto ${v}';
+      pillQuarto.style.borderColor = "#86efac";
+      pillQuarto.style.background = "#f0fdf4";
+      pillQuarto.style.color = "#166534";
+    }
+  }
+
+  // 🔄 Carregar dados (bem melhor do que buscar a lista toda)
+  fetch('${API}/${id}')
+    .then(async res => {
+      if (!res.ok) throw new Error(await res.text() || "Erro ao carregar reserva");
+      return res.json();
+    })
+    .then(r => {
+      form.nome.value = r.nome ?? "";
+      form.telefone.value = r.telefone ?? "";
+      form.checkin.value = r.checkin ?? "";
+      form.checkout.value = r.checkout ?? "";
+      form.tipoQuarto.value = r.tipoQuarto ?? "";
+      form.numeroQuarto.value = (r.numeroQuarto ?? "");
+      form.quantidadePessoas.value = (r.quantidadePessoas ?? "");
+      form.valorTotal.value = (r.valorTotal ?? "");
+      form.valorPago.value = (r.valorPago ?? "");
+      form.status.value = r.status ?? "RESERVADO";
+      atualizarPillQuarto(r.numeroQuarto ?? "");
+    })
+    .catch(err => {
+      showMsg(err.message || "Erro ao carregar reserva", true);
+    });
+
+  // Atualiza a pill conforme digita
+  form.numeroQuarto.addEventListener("input", () => {
+    atualizarPillQuarto(form.numeroQuarto.value);
+  });
+
+  // 💾 Salvar alterações
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    // validação básica de datas
+    if (form.checkout.value && form.checkin.value && form.checkout.value <= form.checkin.value) {
+      showMsg("Check-out deve ser maior que o check-in.", true);
+      return;
+    }
+
     const dados = {
-        nome: form.nome.value,
-        telefone: form.telefone.value,
-        checkin: form.checkin.value,
-        checkout: form.checkout.value,
-        tipoQuarto: form.tipoQuarto.value,
-        quantidadePessoas: form.quantidadePessoas.value,
-        valorTotal: form.valorTotal.value,
-        valorPago: form.valorPago.value,
-        status: form.status.value
+      nome: form.nome.value.trim(),
+      telefone: form.telefone.value.trim(),
+      checkin: form.checkin.value,
+      checkout: form.checkout.value,
+      tipoQuarto: form.tipoQuarto.value.trim() || null,
+
+      // ✅ agora manda o número do quarto
+      numeroQuarto: form.numeroQuarto.value ? Number(form.numeroQuarto.value) : null,
+
+      quantidadePessoas: form.quantidadePessoas.value ? Number(form.quantidadePessoas.value) : null,
+      valorTotal: form.valorTotal.value ? Number(form.valorTotal.value) : 0,
+      valorPago: form.valorPago.value ? Number(form.valorPago.value) : 0,
+      status: form.status.value
     };
 
-    fetch(`${API}/${id}`, {
+    try {
+      const res = await fetch('${API}/${id}', {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dados)
-    })
-    .then(res => {
-        if (!res.ok) throw new Error();
-        alert("Reserva atualizada!");
-        window.location.href = "lista.html";
-    })
-    .catch(() => alert("Erro ao atualizar reserva"));
-});
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Erro ao atualizar reserva");
+      }
+
+      showMsg("✅ Reserva atualizada com sucesso!");
+      setTimeout(() => window.location.href = "lista.html", 600);
+
+    } catch (err) {
+      const m = err.message || "Erro ao atualizar reserva";
+      // se sua API joga msg de conflito
+      if (m.toLowerCase().includes("quarto") && m.toLowerCase().includes("reserv")) {
+        showMsg("❌ Este quarto já está reservado nesse período.", true);
+      } else {
+        showMsg(m, true);
+      }
+    }
+  });
 </script>
 
 </body>

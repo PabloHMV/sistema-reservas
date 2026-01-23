@@ -36,12 +36,7 @@
     justify-content:center;
   }
 
-  .wrap{
-    width:100%;
-    max-width:980px;
-    display:grid;
-    gap:18px;
-  }
+  .wrap{ width:100%; max-width:980px; display:grid; gap:18px; }
 
   .topbar{
     display:flex;
@@ -51,28 +46,11 @@
     flex-wrap:wrap;
   }
 
-  .title{
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-  }
-  .title h1{
-    margin:0;
-    font-size:22px;
-    letter-spacing:.2px;
-  }
-  .title p{
-    margin:0;
-    color:var(--muted);
-    font-size:13px;
-  }
+  .title{ display:flex; flex-direction:column; gap:4px; }
+  .title h1{ margin:0; font-size:22px; letter-spacing:.2px; }
+  .title p{ margin:0; color:var(--muted); font-size:13px; }
 
-  .actions{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    justify-content:flex-end;
-  }
+  .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
 
   .btn{
     appearance:none;
@@ -98,6 +76,7 @@
     background: linear-gradient(135deg, var(--brand), var(--brand2));
     box-shadow: 0 12px 30px rgba(79,124,255,.25);
   }
+  .btn[disabled]{ opacity:.65; cursor:not-allowed; transform:none !important; }
 
   .card{
     background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
@@ -126,11 +105,7 @@
     white-space:nowrap;
   }
 
-  form{
-    padding:18px;
-    display:grid;
-    gap:14px;
-  }
+  form{ padding:18px; display:grid; gap:14px; }
 
   .msg{
     display:none;
@@ -140,6 +115,7 @@
     background: rgba(255,255,255,.06);
     font-size:13px;
     line-height:1.35;
+    white-space: pre-wrap;
   }
   .msg.show{ display:block; }
   .msg.ok{ border-color: rgba(43,213,118,.25); }
@@ -215,22 +191,8 @@
     border-top:1px solid var(--line);
     margin-top:2px;
   }
-  .hint{
-    font-size:12px;
-    color:var(--muted);
-    line-height:1.35;
-  }
-  .footerBtns{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    justify-content:flex-end;
-  }
-  .btn[disabled]{
-    opacity:.65;
-    cursor:not-allowed;
-    transform:none !important;
-  }
+  .hint{ font-size:12px; color:var(--muted); line-height:1.35; }
+  .footerBtns{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
 </style>
 </head>
 
@@ -239,7 +201,7 @@
     <div class="topbar">
       <div class="title">
         <h1>✏️ Editar Reserva</h1>
-        <p>Atualize os dados e salve. (Railway/local: API na mesma origem)</p>
+        <p>Atualize os dados e salve.</p>
       </div>
 
       <div class="actions">
@@ -253,7 +215,7 @@
     <div class="card">
       <div class="cardHead">
         <span class="badge">Reserva ID: <span id="badgeId">-</span></span>
-        <span class="badge" id="apiBadge">API: mesma origem</span>
+        <span class="badge" id="apiBadge">API: ...</span>
       </div>
 
       <form id="formEditar" autocomplete="off">
@@ -290,7 +252,6 @@
             <input name="tipoQuarto" placeholder="Ex: Standard / Luxo / Suíte" />
           </label>
 
-          <!-- ✅ Card bonitão do número do quarto -->
           <div class="roomCard">
             <div class="roomIcon">🏨</div>
             <div class="roomContent">
@@ -353,10 +314,10 @@
   const btnSubmit = document.getElementById("btnSubmit");
   const msgBox = document.getElementById("msgBox");
 
-  // ✅ Railway/local: mesma origem
+  // ✅ mesma origem (Railway/local servindo HTML pelo Spring)
   const API = "/reservas";
 
-  document.getElementById("apiBadge").textContent = 'API: ${location.origin}';
+  document.getElementById("apiBadge").textContent = `API: ${location.origin}`;
   document.getElementById("badgeId").textContent = id ?? "-";
 
   function showMsg(type, text){
@@ -375,34 +336,6 @@
     return Number.isFinite(n) ? n : null;
   }
 
-  async function carregarReserva(){
-    if(!id){
-      showMsg("err", "❌ ID não informado na URL. Abra pelo botão Editar na lista.");
-      return;
-    }
-
-    try{
-      // Melhor: buscar a reserva específica
-      const res = await fetch('${API}/${id}');
-      if(!res.ok){
-        // fallback: se seu backend não tiver GET /reservas/{id}, tenta lista
-        const res2 = await fetch(API);
-        if(!res2.ok) throw new Error("Falha ao carregar reservas");
-        const lista = await res2.json();
-        const r = lista.find(x => String(x.id) === String(id));
-        if(!r) throw new Error("Reserva não encontrada");
-        preencher(r);
-        return;
-      }
-      const r = await res.json();
-      preencher(r);
-
-    }catch(err){
-      console.error(err);
-      showMsg("err", "❌ Não consegui carregar a reserva. Verifique se a API está online.");
-    }
-  }
-
   function preencher(r){
     form.nome.value = r.nome ?? "";
     form.telefone.value = r.telefone ?? "";
@@ -417,11 +350,41 @@
     form.status.value = (r.status ?? "RESERVADO");
   }
 
+  async function carregarReserva(){
+    if(!id){
+      showMsg("err", "❌ ID não informado na URL. Abra pelo botão Editar na lista.");
+      return;
+    }
+
+    try{
+      // Seu backend atual não tem GET /reservas/{id}, então carregamos a lista e filtramos
+      const res = await fetch(API, { credentials: "include" });
+
+      if (res.status === 401){
+        window.location.href = "/login.html";
+        return;
+      }
+
+      if(!res.ok){
+        const t = await res.text();
+        throw new Error(t || "Falha ao carregar reservas");
+      }
+
+      const lista = await res.json();
+      const r = lista.find(x => String(x.id) === String(id));
+      if(!r) throw new Error("Reserva não encontrada");
+      preencher(r);
+
+    }catch(err){
+      console.error(err);
+      showMsg("err", "❌ Não consegui carregar a reserva. Verifique se a API está online.");
+    }
+  }
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     clearMsg();
 
-    // validação simples de datas
     const checkin = form.checkin.value;
     const checkout = form.checkout.value;
     if (checkin && checkout && checkout <= checkin){
@@ -447,11 +410,17 @@
     btnSubmit.textContent = "Salvando...";
 
     try{
-      const res = await fetch('${API}/${id}', {
+      const res = await fetch(`${API}/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dados)
+        body: JSON.stringify(dados),
+        credentials: "include"
       });
+
+      if (res.status === 401){
+        window.location.href = "/login.html";
+        return;
+      }
 
       const bodyText = await res.text();
 

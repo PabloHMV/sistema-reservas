@@ -44,6 +44,7 @@
       align-items:center;
       justify-content:space-between;
       margin-bottom: 14px;
+      flex-wrap: wrap;
     }
 
     .title{ display:flex; align-items:center; gap:10px; }
@@ -143,6 +144,7 @@
     input:focus, select:focus{ border-color: rgba(37,99,235,.65); }
 
     .tableWrap{ width: 100%; overflow:auto; }
+
     table{ width: 100%; border-collapse: collapse; min-width: 980px; }
 
     thead th{
@@ -169,7 +171,6 @@
       vertical-align: middle;
       white-space: nowrap;
     }
-
     tbody tr:hover{ background: rgba(37,99,235,.06); }
 
     .mono{ font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
@@ -276,8 +277,7 @@
 
       <div class="actions">
         <a class="btn" href="index.html">➕ Nova Reserva</a>
-        <button class="btn secondary" id="btnRecarregar" type="button">↻ Recarregar</button>
-        <a class="btn secondary" href="/logout">Sair</a>
+        <button class="btn secondary" id="btnRecarregar">↻ Recarregar</button>
       </div>
     </div>
 
@@ -303,8 +303,8 @@
           <input type="date" id="filtroData"/>
         </div>
 
-        <button class="btn secondary" id="btnFiltrar" type="button">Filtrar</button>
-        <button class="btn danger" id="btnLimpar" type="button">Limpar</button>
+        <button class="btn secondary" id="btnFiltrar">Filtrar</button>
+        <button class="btn danger" id="btnLimpar">Limpar</button>
       </div>
 
       <div class="tableWrap">
@@ -337,8 +337,10 @@
   </div>
 
   <script>
-    // ✅ Railway/local (mesma origem): nada de localhost
+    // ✅ mesma origem (Railway / local servindo pelo Spring)
     const API = "/reservas";
+
+    // ✅ isso estava faltando no seu código:
     let reservas = [];
 
     function toast(msg, type="ok"){
@@ -354,11 +356,6 @@
     function fmtMoney(v){
       const n = Number(v ?? 0);
       return n.toLocaleString("pt-BR", { style:"currency", currency:"BRL" });
-    }
-
-    function fmtDate(iso){
-      if(!iso) return "-";
-      return iso;
     }
 
     function statusPillHtml(status){
@@ -392,17 +389,17 @@
           <td class="mono">${voucher}</td>
           <td>${r.nome ?? "-"}</td>
           <td class="mono">${quarto}</td>
-          <td class="mono">${fmtDate(r.checkin)}</td>
-          <td class="mono">${fmtDate(r.checkout)}</td>
+          <td class="mono">${r.checkin ?? "-"}</td>
+          <td class="mono">${r.checkout ?? "-"}</td>
           <td class="mono">${fmtMoney(total)}</td>
           <td class="mono">${fmtMoney(pago)}</td>
           <td class="mono ${classeValor}">${fmtMoney(restante)}</td>
           <td>${statusPillHtml(r.status)}</td>
           <td>
             <div class="rowActions">
-              <button class="mini voucher" data-id="${r.id}" type="button">Voucher</button>
-              <button class="mini editar" data-id="${r.id}" type="button">Editar</button>
-              <button class="mini excluir" data-id="${r.id}" type="button">Excluir</button>
+              <button class="mini voucher" data-id="${r.id}">Voucher</button>
+              <button class="mini editar" data-id="${r.id}">Editar</button>
+              <button class="mini excluir" data-id="${r.id}">Excluir</button>
             </div>
           </td>
         `;
@@ -414,7 +411,7 @@
       document.getElementById("countInfo").textContent =
         `${lista.length} reserva(s) exibida(s)`;
 
-      // binds
+      // bind dos botões
       document.querySelectorAll(".mini.voucher").forEach(btn=>{
         btn.addEventListener("click", () => voucher(btn.dataset.id));
       });
@@ -431,7 +428,7 @@
       try{
         const res = await fetch(API, { credentials: "include" });
 
-        if (res.status === 401) {
+        if (res.status === 401){
           window.location.href = "/login.html";
           return;
         }
@@ -443,10 +440,9 @@
 
         reservas = await res.json();
         renderizar(reservas);
-
       }catch(err){
         console.error(err);
-        toast("Erro ao carregar reservas. Verifique se GET /reservas está ok.", "err");
+        toast("Erro ao carregar reservas. Verifique a rota GET /reservas.", "err");
         document.getElementById("statusInfo").textContent = "Erro ao carregar.";
         document.getElementById("countInfo").textContent = "";
       }
@@ -477,12 +473,9 @@
     async function excluirReserva(id){
       if(!confirm("Deseja excluir esta reserva?")) return;
       try{
-        const res = await fetch(`${API}/${id}`, {
-          method:"DELETE",
-          credentials: "include"
-        });
+        const res = await fetch(`${API}/${id}`, { method:"DELETE", credentials: "include" });
 
-        if (res.status === 401) {
+        if (res.status === 401){
           window.location.href = "/login.html";
           return;
         }
@@ -491,7 +484,6 @@
           const t = await res.text();
           throw new Error(t || "Falha ao excluir");
         }
-
         toast("Reserva excluída ✅", "ok");
         await carregar();
       }catch(err){
@@ -503,6 +495,7 @@
     function voucher(id){
       window.open(`${API}/voucher/${id}`, "_blank");
     }
+
     function editar(id){
       window.location.href = `editar.html?id=${id}`;
     }

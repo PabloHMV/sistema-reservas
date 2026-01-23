@@ -143,7 +143,6 @@
     input:focus, select:focus{ border-color: rgba(37,99,235,.65); }
 
     .tableWrap{ width: 100%; overflow:auto; }
-
     table{ width: 100%; border-collapse: collapse; min-width: 980px; }
 
     thead th{
@@ -277,7 +276,8 @@
 
       <div class="actions">
         <a class="btn" href="index.html">➕ Nova Reserva</a>
-        <button class="btn secondary" id="btnRecarregar">↻ Recarregar</button>
+        <button class="btn secondary" id="btnRecarregar" type="button">↻ Recarregar</button>
+        <a class="btn secondary" href="/logout">Sair</a>
       </div>
     </div>
 
@@ -303,8 +303,8 @@
           <input type="date" id="filtroData"/>
         </div>
 
-        <button class="btn secondary" id="btnFiltrar">Filtrar</button>
-        <button class="btn danger" id="btnLimpar">Limpar</button>
+        <button class="btn secondary" id="btnFiltrar" type="button">Filtrar</button>
+        <button class="btn danger" id="btnLimpar" type="button">Limpar</button>
       </div>
 
       <div class="tableWrap">
@@ -358,7 +358,7 @@
 
     function fmtDate(iso){
       if(!iso) return "-";
-      return iso; // se quiser, depois eu formato bonitinho dd/mm/yyyy
+      return iso;
     }
 
     function statusPillHtml(status){
@@ -400,9 +400,9 @@
           <td>${statusPillHtml(r.status)}</td>
           <td>
             <div class="rowActions">
-              <button class="mini voucher" data-id="${r.id}">Voucher</button>
-              <button class="mini editar" data-id="${r.id}">Editar</button>
-              <button class="mini excluir" data-id="${r.id}">Excluir</button>
+              <button class="mini voucher" data-id="${r.id}" type="button">Voucher</button>
+              <button class="mini editar" data-id="${r.id}" type="button">Editar</button>
+              <button class="mini excluir" data-id="${r.id}" type="button">Excluir</button>
             </div>
           </td>
         `;
@@ -414,7 +414,7 @@
       document.getElementById("countInfo").textContent =
         `${lista.length} reserva(s) exibida(s)`;
 
-      // bind dos botões (evita problemas com onclick em template)
+      // binds
       document.querySelectorAll(".mini.voucher").forEach(btn=>{
         btn.addEventListener("click", () => voucher(btn.dataset.id));
       });
@@ -429,16 +429,24 @@
     async function carregar(){
       document.getElementById("statusInfo").textContent = "Carregando reservas...";
       try{
-        const res = await fetch(API);
+        const res = await fetch(API, { credentials: "include" });
+
+        if (res.status === 401) {
+          window.location.href = "/login.html";
+          return;
+        }
+
         if(!res.ok){
           const t = await res.text();
           throw new Error(t || "Falha ao buscar reservas");
         }
+
         reservas = await res.json();
         renderizar(reservas);
+
       }catch(err){
         console.error(err);
-        toast("Erro ao carregar reservas. Verifique se a rota GET /reservas está ok.", "err");
+        toast("Erro ao carregar reservas. Verifique se GET /reservas está ok.", "err");
         document.getElementById("statusInfo").textContent = "Erro ao carregar.";
         document.getElementById("countInfo").textContent = "";
       }
@@ -469,11 +477,21 @@
     async function excluirReserva(id){
       if(!confirm("Deseja excluir esta reserva?")) return;
       try{
-        const res = await fetch(`${API}/${id}`, { method:"DELETE" });
+        const res = await fetch(`${API}/${id}`, {
+          method:"DELETE",
+          credentials: "include"
+        });
+
+        if (res.status === 401) {
+          window.location.href = "/login.html";
+          return;
+        }
+
         if(!res.ok){
           const t = await res.text();
           throw new Error(t || "Falha ao excluir");
         }
+
         toast("Reserva excluída ✅", "ok");
         await carregar();
       }catch(err){

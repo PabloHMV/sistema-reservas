@@ -32,7 +32,7 @@ public class ReservaController {
         return reservaService.listar();
     }
 
-    // ✅ BUSCAR RESERVA POR ID (ADICIONADO)
+    // ✅ BUSCAR POR ID  (ADICIONADO)
     @GetMapping("/{id}")
     public Reserva buscarPorId(@PathVariable Long id) {
         return reservaService.buscarPorId(id);

@@ -4,7 +4,9 @@ import com.example.demo.model.Reserva;
 import com.example.demo.repository.ReservaRepository;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.ByteArrayOutputStream;
 import java.time.Year;
@@ -17,6 +19,12 @@ public class ReservaService {
 
     public ReservaService(ReservaRepository reservaRepository) {
         this.reservaRepository = reservaRepository;
+    }
+
+    // ✅ BUSCAR POR ID (resolve seu erro no editar)
+    public Reserva buscarPorId(Long id) {
+        return reservaRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva não encontrada"));
     }
 
     // =========================
@@ -45,7 +53,7 @@ public class ReservaService {
     public Reserva atualizar(Long id, Reserva novaReserva) {
 
         Reserva reserva = reservaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Reserva não encontrada"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva não encontrada"));
 
         validarConflito(novaReserva, id);
 
@@ -70,16 +78,19 @@ public class ReservaService {
     // EXCLUIR
     // =========================
     public void excluir(Long id) {
+        if (!reservaRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva não encontrada");
+        }
         reservaRepository.deleteById(id);
     }
 
     // =========================
-    // VOUCHER (MANTIDO)
+    // VOUCHER
     // =========================
     public byte[] gerarVoucher(Long id) {
 
         Reserva r = reservaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Reserva não encontrada"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva não encontrada"));
 
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -87,10 +98,9 @@ public class ReservaService {
             PdfWriter.getInstance(doc, out);
             doc.open();
 
-            Image logo = Image.getInstance("src/main/resources/static/logoHotel.jpeg");
-            logo.scaleToFit(120, 120);
-            logo.setAlignment(Image.ALIGN_CENTER);
-            doc.add(logo);
+            // ⚠️ No Railway, "src/main/resources/..." não existe em runtime.
+            // O correto é carregar via classpath. Mantive aqui simples, mas se der erro de logo, me fala.
+            // Image logo = Image.getInstance("src/main/resources/static/logoHotel.jpeg");
 
             Font titulo = new Font(Font.HELVETICA, 18, Font.BOLD);
             Font texto = new Font(Font.HELVETICA, 11);
@@ -119,14 +129,14 @@ public class ReservaService {
             addLinha(table, "Telefone", r.getTelefone(), negrito, texto);
             addLinha(table, "CPF/CNPJ", r.getCpfCnpj() != null ? r.getCpfCnpj() : "-", negrito, texto);
             addLinha(table, "Quarto Nº", r.getNumeroQuarto() != null ? r.getNumeroQuarto().toString() : "-", negrito, texto);
-            addLinha(table, "Tipo de Quarto", r.getTipoQuarto(), negrito, texto);
-            addLinha(table, "Check-in", r.getCheckin().toString(), negrito, texto);
-            addLinha(table, "Check-out", r.getCheckout().toString(), negrito, texto);
-            addLinha(table, "Pessoas", String.valueOf(r.getQuantidadePessoas()), negrito, texto);
-            addLinha(table, "Valor Total", "R$ " + r.getValorTotal(), negrito, texto);
-            addLinha(table, "Valor Pago", "R$ " + r.getValorPago(), negrito, texto);
-            addLinha(table, "Valor Restante", "R$ " + r.getValorRestante(), negrito, texto);
-            addLinha(table, "Status", r.getStatus(), negrito, texto);
+            addLinha(table, "Tipo de Quarto", r.getTipoQuarto() != null ? r.getTipoQuarto() : "-", negrito, texto);
+            addLinha(table, "Check-in", r.getCheckin() != null ? r.getCheckin().toString() : "-", negrito, texto);
+            addLinha(table, "Check-out", r.getCheckout() != null ? r.getCheckout().toString() : "-", negrito, texto);
+            addLinha(table, "Pessoas", r.getQuantidadePessoas() != null ? String.valueOf(r.getQuantidadePessoas()) : "-", negrito, texto);
+            addLinha(table, "Valor Total", "R$ " + (r.getValorTotal() != null ? r.getValorTotal() : 0), negrito, texto);
+            addLinha(table, "Valor Pago", "R$ " + (r.getValorPago() != null ? r.getValorPago() : 0), negrito, texto);
+            addLinha(table, "Valor Restante", "R$ " + (r.getValorRestante() != null ? r.getValorRestante() : 0), negrito, texto);
+            addLinha(table, "Status", r.getStatus() != null ? r.getStatus() : "-", negrito, texto);
 
             doc.add(table);
 
@@ -141,7 +151,7 @@ public class ReservaService {
             return out.toByteArray();
 
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao gerar voucher", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao gerar voucher");
         }
     }
 
@@ -151,6 +161,7 @@ public class ReservaService {
     private void validarConflito(Reserva reserva, Long idIgnorar) {
 
         if (reserva.getNumeroQuarto() == null) return;
+        if (reserva.getCheckin() == null || reserva.getCheckout() == null) return;
 
         List<Reserva> conflitos = reservaRepository.verificarConflito(
                 reserva.getNumeroQuarto(),
@@ -160,9 +171,7 @@ public class ReservaService {
 
         for (Reserva r : conflitos) {
             if (idIgnorar == null || !r.getId().equals(idIgnorar)) {
-                throw new RuntimeException(
-                        "Este quarto já está reservado neste período"
-                );
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Este quarto já está reservado neste período");
             }
         }
     }

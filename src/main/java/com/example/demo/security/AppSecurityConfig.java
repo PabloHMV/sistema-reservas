@@ -1,4 +1,3 @@
-
 package com.example.demo.security;
 
 import org.springframework.context.annotation.Bean;
@@ -16,6 +15,9 @@ public class AppSecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+            // ✅ Evita Mixed Content: força HTTPS quando estiver atrás de proxy (Railway)
+            .requiresChannel(ch -> ch.anyRequest().requiresSecure())
+
             // Seu front é estático e consome API com fetch
             .csrf(csrf -> csrf.disable())
 
@@ -31,14 +33,14 @@ public class AppSecurityConfig {
                 // libera a página de login como "home" se quiser
                 .requestMatchers("/").permitAll()
 
-                // TODO o resto exige login (inclusive index.html/lista.html/editar.html e /reservas)
+                // TODO o resto exige login
                 .anyRequest().authenticated()
             )
 
             // Form login padrão do Spring, usando sua página customizada
             .formLogin(form -> form
                 .loginPage("/login.html")
-                .loginProcessingUrl("/login")          // endpoint que recebe user/pass
+                .loginProcessingUrl("/login")
                 .defaultSuccessUrl("/index.html", true)
                 .failureUrl("/login.html?error=1")
                 .permitAll()

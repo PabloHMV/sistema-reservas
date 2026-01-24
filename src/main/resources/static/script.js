@@ -1,4 +1,4 @@
-const API = "http://localhost:8080/reservas";
+const API = "/reservas";
 
 function carregarReservas() {
     const lista = document.getElementById("listaReservas");

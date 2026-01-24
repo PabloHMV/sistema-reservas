@@ -2,42 +2,36 @@ package com.example.demo.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class AppSecurityConfig {
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // ✅ Evita Mixed Content: força HTTPS quando estiver atrás de proxy (Railway)
-            .requiresChannel(ch -> ch.anyRequest().requiresSecure())
-
-            // Seu front é estático e consome API com fetch
             .csrf(csrf -> csrf.disable())
 
             .authorizeHttpRequests(auth -> auth
-                // libera login e arquivos estáticos
                 .requestMatchers(
                     "/login.html", "/favicon.ico",
                     "/logoHotel.jpeg",
                     "/script.js",
                     "/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.jpeg", "/**/*.svg"
                 ).permitAll()
-
-                // libera a página de login como "home" se quiser
                 .requestMatchers("/").permitAll()
-
-                // TODO o resto exige login
                 .anyRequest().authenticated()
             )
 
-            // Form login padrão do Spring, usando sua página customizada
             .formLogin(form -> form
                 .loginPage("/login.html")
                 .loginProcessingUrl("/login")
@@ -49,7 +43,7 @@ public class AppSecurityConfig {
             .rememberMe(rm -> rm
                 .key("troque-essa-chave-por-uma-bem-grande-e-secreta")
                 .rememberMeParameter("remember-me")
-                .tokenValiditySeconds(60 * 60 * 24 * 30) // 30 dias
+                .tokenValiditySeconds(60 * 60 * 24 * 30)
             )
 
             .logout(logout -> logout
@@ -59,13 +53,27 @@ public class AppSecurityConfig {
                 .permitAll()
             )
 
-            .httpBasic(Customizer.withDefaults()); // opcional (útil p/ testes)
+            .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
 
     @Bean
-    PasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    // ✅ cria usuário admin a partir das variáveis do Railway
+    @Bean
+    public UserDetailsService userDetailsService(Environment env, PasswordEncoder encoder) {
+        String user = env.getProperty("ADMIN_USER", "admin");
+        String pass = env.getProperty("ADMIN_PASS", "admin123");
+
+        UserDetails admin = User.withUsername(user)
+                .password(encoder.encode(pass))
+                .roles("ADMIN")
+                .build();
+
+        return new InMemoryUserDetailsManager(admin);
     }
 }

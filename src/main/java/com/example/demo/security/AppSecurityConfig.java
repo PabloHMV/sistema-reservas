@@ -17,7 +17,28 @@ import org.springframework.security.web.SecurityFilterChain;
 public class AppSecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    // ✅ o usuário do painel vem do Railway (ADMIN_USER / ADMIN_PASS)
+    @Bean
+    public UserDetailsService userDetailsService(Environment env, PasswordEncoder encoder) {
+        String user = env.getProperty("ADMIN_USER", "admin");
+        String pass = env.getProperty("ADMIN_PASS", "admin123");
+
+        UserDetails admin = User.withUsername(user)
+                .password(encoder.encode(pass))
+                .roles("ADMIN")
+                .build();
+
+        return new InMemoryUserDetailsManager(admin);
+    }
+
+    // ✅ aqui a gente injeta explicitamente o UserDetailsService
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService uds) throws Exception {
+
         http
             .csrf(csrf -> csrf.disable())
 
@@ -40,7 +61,9 @@ public class AppSecurityConfig {
                 .permitAll()
             )
 
+            // ✅ FIX: informa qual UserDetailsService o remember-me deve usar
             .rememberMe(rm -> rm
+                .userDetailsService(uds)
                 .key("troque-essa-chave-por-uma-bem-grande-e-secreta")
                 .rememberMeParameter("remember-me")
                 .tokenValiditySeconds(60 * 60 * 24 * 30)
@@ -56,24 +79,5 @@ public class AppSecurityConfig {
             .httpBasic(Customizer.withDefaults());
 
         return http.build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    // ✅ cria usuário admin a partir das variáveis do Railway
-    @Bean
-    public UserDetailsService userDetailsService(Environment env, PasswordEncoder encoder) {
-        String user = env.getProperty("ADMIN_USER", "admin");
-        String pass = env.getProperty("ADMIN_PASS", "admin123");
-
-        UserDetails admin = User.withUsername(user)
-                .password(encoder.encode(pass))
-                .roles("ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(admin);
     }
 }

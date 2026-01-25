@@ -1,447 +1,347 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Editar Reserva</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel - Sistema de Reservas</title>
 
-<style>
-  :root{
-    --bg:#0b1220;
-    --card:#0f1a30;
-    --muted:#93a4c7;
-    --text:#e8eeff;
-    --line:rgba(255,255,255,.10);
-    --brand:#4f7cff;
-    --brand2:#2f62ff;
-    --danger:#ff4d4d;
-    --shadow: 0 18px 45px rgba(0,0,0,.45);
-    --radius: 18px;
-  }
+    <style>
+      :root {
+        --bg: #0b1220;
+        --card: rgba(15, 26, 48, 0.65);
+        --muted: #93a4c7;
+        --text: #e8eeff;
+        --line: rgba(255, 255, 255, 0.1);
+        --brand: #4f7cff;
+        --brand2: #2f62ff;
+        --danger: #ff4d4d;
+        --ok: #2bd576;
+        --shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+        --radius: 18px;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(1200px 600px at 20% 10%, rgba(79, 124, 255, 0.18), transparent 60%),
+          radial-gradient(900px 500px at 80% 20%, rgba(43, 213, 118, 0.12), transparent 55%),
+          radial-gradient(700px 450px at 55% 90%, rgba(255, 77, 77, 0.10), transparent 60%),
+          var(--bg);
+        min-height: 100vh;
+        padding: 22px;
+      }
 
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    color:var(--text);
-    background:
-      radial-gradient(1200px 600px at 20% 10%, rgba(79,124,255,.18), transparent 60%),
-      radial-gradient(900px 500px at 80% 20%, rgba(43,213,118,.12), transparent 55%),
-      radial-gradient(700px 450px at 55% 90%, rgba(255,77,77,.10), transparent 60%),
-      var(--bg);
-    min-height:100vh;
-    padding:24px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
+      .topbar{
+        max-width: 1200px;
+        margin: 0 auto 16px;
+        display:flex;
+        gap:12px;
+        align-items:center;
+        justify-content:space-between;
+      }
+      .brand{
+        display:flex;
+        gap:12px;
+        align-items:center;
+      }
+      .logo{
+        width: 46px; height: 46px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, rgba(79,124,255,.35), rgba(79,124,255,.10));
+        border:1px solid var(--line);
+        display:grid; place-items:center;
+        font-size: 20px;
+        flex:0 0 auto;
+        overflow:hidden;
+      }
+      .logo img{ width:100%; height:100%; object-fit:cover; display:block; }
+      .brand h1{
+        margin:0;
+        font-size: 18px;
+        line-height:1.2;
+        letter-spacing:.2px;
+      }
+      .brand p{
+        margin:3px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
 
-  .wrap{ width:100%; max-width:980px; display:grid; gap:18px; }
+      .actions{
+        display:flex; gap:10px; flex-wrap:wrap;
+      }
+      .btn{
+        appearance:none;
+        border:0;
+        cursor:pointer;
+        padding: 10px 12px;
+        border-radius: 14px;
+        font-weight: 900;
+        color:white;
+        background: linear-gradient(135deg, var(--brand), var(--brand2));
+        box-shadow: 0 12px 30px rgba(79,124,255,.18);
+        transition: .15s ease;
+        font-size: 13px;
+        text-decoration:none;
+        display:inline-flex;
+        gap:8px;
+        align-items:center;
+      }
+      .btn:hover{ transform: translateY(-1px); }
+      .btn:active{ transform: translateY(0); }
+      .btn.secondary{
+        background: rgba(255,255,255,.07);
+        border: 1px solid var(--line);
+        box-shadow:none;
+      }
+      .btn.danger{
+        background: rgba(255,77,77,.16);
+        border:1px solid rgba(255,77,77,.22);
+        box-shadow:none;
+      }
 
-  .topbar{
-    display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
-  }
+      .wrap{
+        max-width: 1200px;
+        margin: 0 auto;
+        display:grid;
+        gap:16px;
+        grid-template-columns: 1fr;
+      }
+      @media (min-width: 980px){
+        .wrap{ grid-template-columns: 1fr 1fr; }
+      }
 
-  .title{ display:flex; flex-direction:column; gap:4px; }
-  .title h1{ margin:0; font-size:22px; letter-spacing:.2px; }
-  .title p{ margin:0; color:var(--muted); font-size:13px; }
+      .card{
+        border-radius: var(--radius);
+        border:1px solid var(--line);
+        background: var(--card);
+        box-shadow: var(--shadow);
+        padding: 18px;
+        overflow:hidden;
+      }
+      .card h2{
+        margin:0 0 6px;
+        font-size: 16px;
+        font-weight: 900;
+      }
+      .card .sub{
+        margin:0 0 14px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height:1.35;
+      }
 
-  .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+      form{
+        display:grid;
+        gap: 12px;
+      }
+      .grid{
+        display:grid;
+        gap: 12px;
+        grid-template-columns: 1fr;
+      }
+      @media (min-width: 520px){
+        .grid{ grid-template-columns: 1fr 1fr; }
+      }
+      label{
+        display:flex;
+        flex-direction:column;
+        gap:6px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      input, select{
+        width: 100%;
+        padding: 12px 12px;
+        border-radius: 12px;
+        border:1px solid var(--line);
+        background: rgba(10,16,30,.65);
+        color: var(--text);
+        outline:none;
+        font-size: 14px;
+        transition: .15s ease;
+      }
+      input:focus, select:focus{
+        border-color: rgba(79,124,255,.55);
+        box-shadow: 0 0 0 4px rgba(79,124,255,.14);
+      }
 
-  .btn{
-    appearance:none;
-    border:1px solid var(--line);
-    background:rgba(255,255,255,.06);
-    color:var(--text);
-    padding:10px 14px;
-    border-radius:12px;
-    cursor:pointer;
-    font-weight:800;
-    font-size:14px;
-    text-decoration:none;
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    transition: .15s ease;
-    user-select:none;
-  }
-  .btn:hover{ transform: translateY(-1px); border-color:rgba(255,255,255,.18); }
-  .btn:active{ transform: translateY(0); }
-  .btn.primary{
-    border:0;
-    background: linear-gradient(135deg, var(--brand), var(--brand2));
-    box-shadow: 0 12px 30px rgba(79,124,255,.25);
-  }
-  .btn[disabled]{ opacity:.65; cursor:not-allowed; transform:none !important; }
+      .row{
+        display:flex;
+        gap: 10px;
+        flex-wrap:wrap;
+        align-items:center;
+        justify-content:space-between;
+        margin-top: 4px;
+      }
+      .hint{
+        color: var(--muted);
+        font-size: 12px;
+        line-height:1.4;
+      }
 
-  .card{
-    background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-    border:1px solid var(--line);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow:hidden;
-  }
+      table{
+        width:100%;
+        border-collapse: collapse;
+        overflow:hidden;
+        border-radius: 14px;
+        border:1px solid var(--line);
+        background: rgba(255,255,255,.04);
+      }
+      thead th{
+        text-align:left;
+        font-size: 12px;
+        color: var(--muted);
+        padding: 10px 10px;
+        border-bottom:1px solid var(--line);
+        font-weight: 800;
+      }
+      tbody td{
+        padding: 10px 10px;
+        border-bottom:1px solid rgba(255,255,255,.06);
+        font-size: 13px;
+      }
+      tbody tr:last-child td{ border-bottom:0; }
 
-  .cardHead{
-    padding:16px 18px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
-    border-bottom:1px solid var(--line);
-  }
+      .miniBtn{
+        background: rgba(255,77,77,.12);
+        border:1px solid rgba(255,77,77,.18);
+        color: #ffd7d7;
+        border-radius: 10px;
+        padding: 7px 10px;
+        cursor:pointer;
+        font-weight: 900;
+        font-size: 12px;
+      }
+      .miniBtn:hover{ filter: brightness(1.1); }
+      .empty{
+        color: var(--muted);
+        font-size: 13px;
+        padding: 10px 0 0;
+      }
+    </style>
 
-  .badge{
-    font-size:12px;
-    padding:6px 10px;
-    border-radius:999px;
-    border:1px solid var(--line);
-    color:var(--muted);
-    background: rgba(255,255,255,.06);
-    white-space:nowrap;
-  }
+    <!-- IMPORTANTE: seu script.js precisa estar em /static/script.js -->
+    <script defer src="/script.js"></script>
+  </head>
 
-  form{ padding:18px; display:grid; gap:14px; }
-
-  .msg{
-    display:none;
-    padding:12px 12px;
-    border-radius: 14px;
-    border:1px solid var(--line);
-    background: rgba(255,255,255,.06);
-    font-size:13px;
-    line-height:1.35;
-    white-space:pre-wrap;
-  }
-  .msg.show{ display:block; }
-  .msg.ok{ border-color: rgba(43,213,118,.25); }
-  .msg.err{ border-color: rgba(255,77,77,.28); }
-
-  .grid{ display:grid; grid-template-columns: 1fr; gap:12px; }
-  @media (min-width: 860px){
-    .grid{ grid-template-columns: repeat(2, 1fr); }
-    .span2{ grid-column: span 2; }
-  }
-
-  label{ display:flex; flex-direction:column; gap:6px; font-size:13px; color:var(--muted); }
-
-  input, select{
-    width:100%;
-    padding:12px 12px;
-    border-radius: 12px;
-    border:1px solid var(--line);
-    background: rgba(10,16,30,.65);
-    color: var(--text);
-    outline:none;
-    transition:.15s ease;
-    font-size:14px;
-  }
-  input::placeholder{ color: rgba(147,164,199,.7); }
-  input:focus, select:focus{
-    border-color: rgba(79,124,255,.55);
-    box-shadow: 0 0 0 4px rgba(79,124,255,.14);
-  }
-
-  .roomCard{
-    grid-column: span 2;
-    border:1px solid rgba(79,124,255,.25);
-    background: radial-gradient(900px 220px at 20% 10%, rgba(79,124,255,.18), transparent 60%),
-                rgba(255,255,255,.04);
-    border-radius: 16px;
-    padding: 14px;
-    display:flex;
-    gap:12px;
-    align-items:flex-start;
-  }
-  .roomIcon{
-    width:44px;height:44px;
-    border-radius:14px;
-    display:grid;place-items:center;
-    background: rgba(79,124,255,.18);
-    border:1px solid rgba(255,255,255,.10);
-    flex:0 0 auto;
-    font-size:18px;
-  }
-  .roomContent{ flex:1; display:grid; gap:8px; }
-  .roomTitle{ color:var(--text); font-weight:900; font-size:14px; }
-  .roomHint{ color:var(--muted); font-size:12px; line-height:1.35; }
-
-  .row{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    align-items:center;
-    justify-content:space-between;
-    padding-top:6px;
-    border-top:1px solid var(--line);
-    margin-top:2px;
-  }
-  .hint{ font-size:12px; color:var(--muted); line-height:1.35; }
-  .footerBtns{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
-</style>
-</head>
-
-<body>
-  <div class="wrap">
+  <body>
     <div class="topbar">
-      <div class="title">
-        <h1>✏️ Editar Reserva</h1>
-        <p>Atualize os dados e salve. (Railway/local: API na mesma origem)</p>
+      <div class="brand">
+        <div class="logo">
+          <!-- se você tiver /logoHotel.jpeg no static, ele aparece aqui -->
+          <img src="/logoHotel.jpeg" alt="Logo" onerror="this.remove()" />
+          <span style="display:none">🏨</span>
+        </div>
+        <div>
+          <h1>Painel de Reservas</h1>
+          <p>Sistema interno • criar e consultar reservas</p>
+        </div>
       </div>
 
       <div class="actions">
-        <a class="btn" href="lista.html">⬅ Voltar</a>
-        <button class="btn primary" type="button" onclick="document.getElementById('formEditar').requestSubmit()">
-          💾 Salvar
-        </button>
+        <a class="btn secondary" href="/lista.html">📋 Lista</a>
+        <a class="btn secondary" href="/reservas.html">🗓️ Reservas</a>
+        <a class="btn secondary" href="/editar.html">✏️ Editar</a>
+        <a class="btn danger" href="/logout">🚪 Sair</a>
       </div>
     </div>
 
-    <div class="card">
-      <div class="cardHead">
-        <span class="badge">Reserva ID: <span id="badgeId">-</span></span>
-        <span class="badge" id="apiBadge">API: ...</span>
-      </div>
+    <div class="wrap">
+      <div class="card">
+        <h2>Nova Reserva</h2>
+        <p class="sub">Preencha os dados e clique em <b>Salvar</b>. Depois você será levado para a listagem.</p>
 
-      <form id="formEditar" autocomplete="off">
-        <div class="msg" id="msgBox"></div>
+        <!-- seu script.js usa: document.getElementById("formReserva") -->
+        <form id="formReserva">
+          <div class="grid">
+            <label>Nome
+              <input id="nome" name="nome" required placeholder="Ex: João Silva" />
+            </label>
 
-        <div class="grid">
-          <label class="span2">
-            Nome *
-            <input name="nome" placeholder="Ex: João Silva" required />
-          </label>
+            <label>Telefone
+              <input id="telefone" name="telefone" required placeholder="(31) 9xxxx-xxxx" />
+            </label>
 
-          <label>
-            Telefone *
-            <input name="telefone" placeholder="(31) 99999-9999" required />
-          </label>
+            <label>Check-in
+              <input id="checkin" name="checkin" type="date" required />
+            </label>
 
-          <label>
-            CPF / CNPJ (opcional)
-            <input name="cpfCnpj" placeholder="Somente números" inputmode="numeric" />
-          </label>
+            <label>Check-out
+              <input id="checkout" name="checkout" type="date" required />
+            </label>
 
-          <label>
-            Check-in *
-            <input type="date" name="checkin" required />
-          </label>
+            <label>Placa do carro (opcional)
+              <input id="placaCarro" name="placaCarro" placeholder="ABC-1234" />
+            </label>
 
-          <label>
-            Check-out *
-            <input type="date" name="checkout" required />
-          </label>
+            <label>Nº do quarto (opcional)
+              <input id="numeroQuarto" name="numeroQuarto" placeholder="Ex: 12" />
+            </label>
 
-          <label class="span2">
-            Tipo do quarto (opcional)
-            <input name="tipoQuarto" placeholder="Ex: Standard / Luxo / Suíte" />
-          </label>
+            <label>Tipo do quarto
+              <input id="tipoQuarto" name="tipoQuarto" required placeholder="Ex: Casal / Solteiro / Luxo" />
+            </label>
 
-          <div class="roomCard">
-            <div class="roomIcon">🏨</div>
-            <div class="roomContent">
-              <div class="roomTitle">Número do quarto</div>
-              <div class="roomHint">
-                Se você informar o número do quarto, o sistema valida conflito de datas por quarto.
-                Se não tiver, pode deixar em branco.
-              </div>
-              <label style="margin:0; color: var(--muted);">
-                Número do quarto (opcional)
-                <input type="number" name="numeroQuarto" placeholder="Ex: 213" />
-              </label>
+            <label>Qtd. pessoas
+              <input id="quantidadePessoas" name="quantidadePessoas" type="number" min="1" required placeholder="Ex: 2" />
+            </label>
+
+            <label>Valor total
+              <input id="valorTotal" name="valorTotal" type="number" step="0.01" required placeholder="Ex: 350.00" />
+            </label>
+
+            <label>Valor pago
+              <input id="valorPago" name="valorPago" type="number" step="0.01" required placeholder="Ex: 100.00" />
+            </label>
+
+            <label>Status
+              <select id="status" name="status" required>
+                <option value="reservado">Reservado</option>
+                <option value="aguardado retorno">Aguardado retorno</option>
+                <option value="cancelado">Cancelado</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="row">
+            <div class="hint">
+              Dica: depois de salvar, você pode excluir/consultar em <b>Lista</b>.
             </div>
+            <button class="btn" type="submit">✅ Salvar reserva</button>
           </div>
+        </form>
+      </div>
 
-          <label>
-            Qtd. pessoas (opcional)
-            <input type="number" name="quantidadePessoas" placeholder="Ex: 2" />
-          </label>
+      <div class="card">
+        <h2>Reservas (prévia)</h2>
+        <p class="sub">Essa tabela é carregada por <b>/reservas</b> (o mesmo endpoint do seu backend).</p>
 
-          <label>
-            Valor total (R$)
-            <input type="number" step="0.01" name="valorTotal" placeholder="Ex: 450.00" />
-          </label>
-
-          <label>
-            Valor pago (R$)
-            <input type="number" step="0.01" name="valorPago" placeholder="Ex: 100.00" />
-          </label>
-
-          <label class="span2">
-            Status *
-            <select name="status" required>
-              <option value="RESERVADO">Reservado</option>
-              <option value="AGUARDANDO">Aguardando retorno</option>
-              <option value="CANCELADO">Cancelado</option>
-            </select>
-          </label>
+        <div style="overflow:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Quarto</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <!-- seu script.js procura #listaReservas -->
+            <tbody id="listaReservas">
+              <tr><td colspan="6" class="empty">Carregando...</td></tr>
+            </tbody>
+          </table>
         </div>
 
-        <div class="row">
-          <div class="hint">
-            Dica: no Railway, deixe o front usando <b>/reservas</b> (sem localhost).
-          </div>
-
-          <div class="footerBtns">
-            <button class="btn" type="reset">🧹 Reset</button>
-            <button class="btn primary" id="btnSubmit" type="submit">💾 Salvar Alterações</button>
-          </div>
+        <div class="hint" style="margin-top:10px;">
+          Se essa tabela não carregar, o backend pode estar pedindo login (session) — aí é só ajustar o fetch do <b>script.js</b> para usar <code>credentials: "include"</code>.
         </div>
-      </form>
+      </div>
     </div>
-  </div>
-
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
-
-  const form = document.getElementById("formEditar");
-  const btnSubmit = document.getElementById("btnSubmit");
-  const msgBox = document.getElementById("msgBox");
-
-  // ✅ Railway/local: mesma origem
-  const API = "/reservas";
-
-  document.getElementById("apiBadge").textContent = `API: ${location.origin}`;
-  document.getElementById("badgeId").textContent = id ?? "-";
-
-  function showMsg(type, text){
-    msgBox.className = "msg show " + (type === "ok" ? "ok" : "err");
-    msgBox.textContent = text;
-  }
-  function clearMsg(){
-    msgBox.className = "msg";
-    msgBox.textContent = "";
-  }
-
-  function toNumberOrNull(v){
-    const s = String(v ?? "").trim();
-    if(!s) return null;
-    const n = Number(s);
-    return Number.isFinite(n) ? n : null;
-  }
-
-  function preencher(r){
-    form.nome.value = r.nome ?? "";
-    form.telefone.value = r.telefone ?? "";
-    form.cpfCnpj.value = r.cpfCnpj ?? "";
-    form.checkin.value = r.checkin ?? "";
-    form.checkout.value = r.checkout ?? "";
-    form.tipoQuarto.value = r.tipoQuarto ?? "";
-    form.numeroQuarto.value = (r.numeroQuarto ?? "");
-    form.quantidadePessoas.value = (r.quantidadePessoas ?? "");
-    form.valorTotal.value = (r.valorTotal ?? "");
-    form.valorPago.value = (r.valorPago ?? "");
-    form.status.value = (r.status ?? "RESERVADO");
-  }
-
-  async function carregarReserva(){
-    if(!id){
-      showMsg("err", "❌ ID não informado na URL. Abra pelo botão Editar na lista.");
-      return;
-    }
-
-    try{
-      // Tenta GET /reservas/{id} (recomendado)
-      let res = await fetch(`${API}/${id}`, { credentials: "include" });
-
-      if (res.status === 401) {
-        window.location.href = "/login.html";
-        return;
-      }
-
-      if(res.ok){
-        const r = await res.json();
-        preencher(r);
-        return;
-      }
-
-      // Fallback: se não tiver GET /{id}, carrega lista e encontra
-      const res2 = await fetch(API, { credentials: "include" });
-
-      if (res2.status === 401) {
-        window.location.href = "/login.html";
-        return;
-      }
-
-      if(!res2.ok) throw new Error("Falha ao carregar reservas");
-
-      const lista = await res2.json();
-      const r = lista.find(x => String(x.id) === String(id));
-      if(!r) throw new Error("Reserva não encontrada");
-      preencher(r);
-
-    }catch(err){
-      console.error(err);
-      showMsg("err", "❌ Não consegui carregar a reserva. Verifique se a API está online.");
-    }
-  }
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    clearMsg();
-
-    const checkin = form.checkin.value;
-    const checkout = form.checkout.value;
-    if (checkin && checkout && checkout <= checkin){
-      showMsg("err", "❌ O Check-out precisa ser depois do Check-in.");
-      return;
-    }
-
-    const dados = {
-      nome: form.nome.value.trim(),
-      telefone: form.telefone.value.trim(),
-      cpfCnpj: form.cpfCnpj.value.trim() || null,
-      checkin,
-      checkout,
-      tipoQuarto: form.tipoQuarto.value.trim() || null,
-      numeroQuarto: toNumberOrNull(form.numeroQuarto.value),
-      quantidadePessoas: toNumberOrNull(form.quantidadePessoas.value),
-      valorTotal: toNumberOrNull(form.valorTotal.value) ?? 0,
-      valorPago: toNumberOrNull(form.valorPago.value) ?? 0,
-      status: form.status.value
-    };
-
-    btnSubmit.disabled = true;
-    btnSubmit.textContent = "Salvando...";
-
-    try{
-      const res = await fetch(`${API}/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dados),
-        credentials: "include"
-      });
-
-      if (res.status === 401) {
-        window.location.href = "/login.html";
-        return;
-      }
-
-      const bodyText = await res.text();
-
-      if(!res.ok){
-        let msg = bodyText || "Erro ao atualizar reserva";
-        if (msg.toLowerCase().includes("quarto") || msg.toLowerCase().includes("reservad")){
-          msg = "❌ Este quarto já está reservado nesse período.";
-        }
-        showMsg("err", msg);
-        return;
-      }
-
-      showMsg("ok", "✅ Reserva atualizada! Voltando para a lista...");
-      setTimeout(() => window.location.href = "lista.html", 700);
-
-    }catch(err){
-      console.error(err);
-      showMsg("err", "❌ Falha de conexão com a API. Verifique se o backend está online.");
-    }finally{
-      btnSubmit.disabled = false;
-      btnSubmit.textContent = "💾 Salvar Alterações";
-    }
-  });
-
-  carregarReserva();
-</script>
-</body>
+  </body>
 </html>
